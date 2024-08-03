@@ -37,6 +37,7 @@ Think of these as your handy toolbox for common Linux tasks. They're not fancy â
 ## Encoding and Decoding
 - **encode:** Encodes text into various formats including base64, hex, ROT47, and more.
 - **decode:** Decodes various encoded text formats including base64, hex, ROT47, Caesar Cipher, etc.
+- **haid:** A Hash Analyzer and Identifier script that helps identify hash types using multiple tools (hashid, Name-That-Hash, hash-identifier, and haiti) and provides relevant information for cracking, including Hashcat modes and John the Ripper formats.
 
 ## Network and Security
 - **getlink:** Extracts and prints all links from the provided webpage URL.
@@ -57,4 +58,7 @@ Think of these as your handy toolbox for common Linux tasks. They're not fancy â
 ## Miscellaneous
 - **say:** Converts text to speech and plays it in Hebrew.
 - **gitupdate:** Commits changes to a Git repository and pushes them to the remote master branch.
+ 
+
+
  
