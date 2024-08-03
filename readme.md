@@ -4,9 +4,7 @@ Welcome to my collection of simple yet powerful Linux tools! These are just ever
 
 Think of these as your handy toolbox for common Linux tasks. They're not fancy – just practical. I use these regularly to simplify my workflow, and I hope they'll do the same for you.
 
-## System Management and Utilities
 
-[Rest of the content remains the same as in the previous artifact]
 ## System Operations
 - **update:** Updates and upgrades system packages, including fixing broken dependencies.
 - **clean:** Cleans up unused packages and dependencies.
