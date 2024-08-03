@@ -689,9 +689,7 @@ if __name__ == "__main__":
  
     
     args = parser.parse_args()
-  
-    #file_path = None
-    #sys.argv = ["", "/home/yaniv/hash.txt", "-o"] # for debug
+   
     print (sys.argv)
     if len(sys.argv) > 1 and not '-h' in sys.argv or '--help' in sys.argv:
         file_path = args.file_path
