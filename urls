@@ -1,0 +1,3 @@
+#!/bin/bash
+cd /home/yaniv/scripts-yaniv/url/
+python3 urlscrap.py
