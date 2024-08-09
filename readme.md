@@ -54,6 +54,9 @@ Think of these as your handy toolbox for common Linux tasks. They're not fancy â
 - **trw:** Translates given text to Hebrew using various AI models.
 - **trf:** Translates subtitle files to Hebrew using different AI translators.
 - **vidsubs:** Matches video files with their respective subtitle files.
+- **whis** Transcribes audio files using the Whisper model, supporting both CPU and GPU execution, with options to specify the model and language. Outputs the transcription in SRT format with timestamps.
+- **ytsub:** Downloads and processes subtitles from YouTube videos, with options to specify language and output format.
+
 
 ## Miscellaneous
 - **say:** Converts text to speech and plays it in Hebrew.

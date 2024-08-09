@@ -1,0 +1,91 @@
+#!/usr/bin/env python
+
+import torch
+import whisper
+from torch.cuda.amp import autocast
+import gc
+import os
+import argparse
+import sys
+
+def enable_checkpointing(model):
+    if hasattr(model, 'encoder'):
+        model.encoder.gradient_checkpointing = True
+    if hasattr(model, 'decoder'):
+        model.decoder.gradient_checkpointing = True
+    return model
+
+def format_timestamp(seconds):
+    hours = seconds // 3600
+    minutes = (seconds % 3600) // 60
+    seconds = seconds % 60
+    return f"{int(hours):02d}:{int(minutes):02d}:{seconds:05.2f}"
+
+def transcribe_audio(audio_path, model_name="large-v3", language="he"):
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"Using device: {device}")
+
+    if device.type == "cuda":
+        torch.backends.cuda.matmul.allow_tf32 = True
+        torch.backends.cudnn.allow_tf32 = True
+        torch.backends.cudnn.benchmark = True
+        torch.backends.cudnn.deterministic = False
+
+    print(f"Loading {model_name} model...")
+    model = whisper.load_model(model_name, device="cpu", download_root="/home/yaniv/.cache/whisper/")
+    model = enable_checkpointing(model)
+    model = model.to(device)
+
+    if device.type == "cuda":
+        model = model.half()
+
+    torch.cuda.empty_cache()
+    gc.collect()
+
+    print(f"Transcribing audio...")
+    with torch.inference_mode(), autocast(enabled=device.type=="cuda"):
+        result = model.transcribe(audio_path, language=language, fp16=(device.type=="cuda"))
+
+    torch.cuda.empty_cache()
+    gc.collect()
+
+    return result
+
+def write_srt(result, output_file):
+    with open(output_file, 'w', encoding='utf-8') as f:
+        for i, segment in enumerate(result["segments"], start=1):
+            start = format_timestamp(segment["start"]).replace(".", ",")
+            end = format_timestamp(segment["end"]).replace(".", ",")
+            text = segment["text"].strip()
+            f.write(f"{i}\n{start} --> {end}\n{text}\n\n")
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Transcribe audio using Whisper")
+    parser.add_argument("audio_file", help="Path to the audio file")
+    parser.add_argument("--model", default="large-v3", help="Model to use for transcription (default: large-v3)")
+    parser.add_argument("--lang", default="he", help="Language of the audio (default: he)")
+    parser.add_argument("--output", help="Output SRT file path (default: same as input with .srt extension)")
+    
+    args = parser.parse_args()
+    try:
+        result = transcribe_audio(args.audio_file, model_name=args.model, language=args.lang)
+        
+        # Determine output file name
+        if args.output:
+            output_file = args.output
+        else:
+            output_file = os.path.splitext(args.audio_file)[0] + ".srt"
+
+        # Write SRT file
+        write_srt(result, output_file)
+        print(f"\nTranscription saved to {output_file}")
+
+        print("\nTranscription with timestamps:")
+        for segment in result["segments"]:
+            start = format_timestamp(segment["start"])
+            end = format_timestamp(segment["end"])
+            text = segment["text"]
+            print(f"[{start} --> {end}] {text}")
+    except KeyboardInterrupt:
+        print("\r\rexiting..")
+        sys.exit(0)

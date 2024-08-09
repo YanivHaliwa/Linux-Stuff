@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# Check if a URL is provided
+if [ $# -eq 0 ]; then
+    echo "Please provide a YouTube URL as an argument."
+    exit 1
+fi
+
+# YouTube URL
+URL=$1
+
+# Output filename
+OUTPUT="file.mp4"
+
+# Download the video
+echo "Downloading video..."
+yt-dlp "$URL" -o "$OUTPUT" --merge-output-format mp4
+
+# Check if download was successful
+if [ $? -ne 0 ]; then
+    echo "Error downloading the video."
+    exit 1
+fi
+
+# Run whisper on the downloaded file
+echo "Running whisper on $OUTPUT..."
+whis "$OUTPUT"
+
+echo "Process completed."
