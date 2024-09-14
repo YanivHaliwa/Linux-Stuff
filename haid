@@ -80,30 +80,32 @@ def analyze_hash(hashfile):
     print(haiti_output.stdout)
 
 def choose_hash_type(filename, search_term):
-    choice=0
+    choice = 0
     matching_lines = []
     try:
         with open(filename, 'r') as file:
             for line in file:
-                if search_term.lower() in line.lower():
+                normalized_line = line.lower().replace('-', '')
+                normalized_search = search_term.lower().replace('-', '')
+                if normalized_search in normalized_line:
                     matching_lines.append(line.strip())
     except FileNotFoundError:
         print("The hash mode file was not found.")
         return None
 
     if not matching_lines:
-        print(f"{Fore.RED}No matching hash types found for '{search_term}'{Style.RESET_ALL}")
         return None
     if len(matching_lines) == 1:
-        chosen_line= matching_lines[0].split('|')[0].strip()
+        chosen_line = matching_lines[0].split('|')[0].strip()
     else:
         for i, line in enumerate(matching_lines):
             print(f"{i + 1}. {line}")
         choice = int(input(f"{Fore.YELLOW}Choose a hash type (1-{len(matching_lines)}): {Style.RESET_ALL}"))
         chosen_line = matching_lines[choice - 1]
     hash_type_code = chosen_line.split('|')[0].strip()
-    hash_type =matching_lines[choice - 1].split('|')[1].strip()
+    hash_type = matching_lines[choice - 1].split('|')[1].strip()
     return hash_type_code, hash_type
+ 
 
 def get_hash(hashfile):
     try:
@@ -153,11 +155,7 @@ def htj(hashcat_mode):
         }
 
     return hashcat_to_john.get(hashcat_mode, "Unknown Hashcat Mode")
-
-def correct_hash_type(user_input):
-    if user_input.startswith("sha-"):
-        return user_input.replace("sha-", "sha2-")
-    return user_input
+ 
 
 def main():
     parser = argparse.ArgumentParser(description="This is a script for hashcat operations.")
@@ -173,11 +171,12 @@ def main():
             analyze_hash(args.hashfile)
             print("")
             user_hash_type = input(f"{Fore.CYAN}Enter the hash type name or part of it: {Style.RESET_ALL}")
-            corrected_hash_type = correct_hash_type(user_hash_type)
-          #  hash_type = choose_hash_type(type_file, corrected_hash_type)
-            hash_type_code, hash_type = choose_hash_type(type_file, corrected_hash_type)
-            if not hash_type_code:
-                return  # Exit if no hash type is found
+            result = choose_hash_type(type_file, user_hash_type)
+            if result is None:
+                print(f"{Fore.RED}No matching hash types found. Exiting.'{Style.RESET_ALL}")
+                sys.exit(1)   
+            else:
+                hash_type_code, hash_type = result
 
         hash_value = get_hash(args.hashfile)
         if hash_value:
