@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# Log file path
+LOG_FILE="$HOME/.cache/battery_state_log.txt"
+
+# Check current battery state
+CURRENT_STATE=$(upower -i $(upower -e | grep battery) | grep state | awk '{print $2}')
+
+# Get the last recorded state from the log file if it exists
+if [ -f "$LOG_FILE" ]; then
+    LAST_STATE=$(tail -n 1 "$LOG_FILE" | awk '{print $NF}')
+else
+    LAST_STATE=""
+fi
+
+# Check if the state has changed and is not "pending-charge"
+if [ "$CURRENT_STATE" != "$LAST_STATE" ] && [[ "$CURRENT_STATE" == "charging" || "$CURRENT_STATE" == "discharging" ]]; then
+    # Log the state change with timestamp
+    echo "$(date '+%Y-%m-%d %H:%M:%S') - State changed to: $CURRENT_STATE" >> "$LOG_FILE"
+fi

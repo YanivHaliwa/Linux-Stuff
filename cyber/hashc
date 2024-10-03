@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# Check if the correct number of arguments is provided
+if [ "$#" -ne 2 ]; then
+    echo "Usage: $0 <hash_type> <wordlist>"
+    exit 1
+fi
+
+# Assign command-line arguments to variables
+type=$1
+wordlist=$2
+
+# Run the hashcat command with the provided arguments
+hashcat -w 4 -O --status -m "$type" ~/hash.txt "$wordlist" 2>/dev/null
+
+echo ""
+echo "last cracked:"
+tail -n 2 $HOME/.local/share/hashcat/hashcat.potfile

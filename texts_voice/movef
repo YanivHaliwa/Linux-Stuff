@@ -32,11 +32,10 @@ fi
 # Temporary file for storing file paths and directories
 temp_file=$(mktemp)
 temp_dir_file=$(mktemp)
-
 # Find and store all files from subdirectories
-find "$source_dir" -mindepth 2 -type f > "$temp_file"
+find "$source_dir" -mindepth 2 -type f -not -path "*/.Trash-1000/*" > "$temp_file"
 # Store all subdirectories that have been operated on
-find "$source_dir" -mindepth 1 -type d > "$temp_dir_file"
+find "$source_dir" -mindepth 1 -type d -not -name ".Trash-1000" > "$temp_dir_file"
 
 # Move files, renaming by appending last directory name to avoid overwrites
 while IFS= read -r file; do

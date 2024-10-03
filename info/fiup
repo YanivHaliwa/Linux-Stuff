@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# Function to display help
+show_help() {
+    echo "Usage: $0 <location> <time> [kind]"
+    echo
+    echo "Find and list files modified within a specified time frame."
+    echo
+    echo "Arguments:"
+    echo "  location  The directory to search in"
+    echo "  time      Number of days to look back"
+    echo "  kind      (Optional) File extension or pattern to search for"
+    echo
+    echo "Example:"
+    echo "  $0 .  7 *.txt"
+}
+
+# Display help if no arguments are provided
+if [ $# -eq 0 ]; then
+    show_help
+    exit 1
+fi
+
+
+location=$1
+time=$2
+
+# Shift the first two arguments to process the rest as patterns/files
+shift 2
+
+# Collect remaining arguments as a pattern list or file names
+kind=("$@")
+
+# Check if patterns were provided (handling each expanded argument)
+if [ "${#kind[@]}" -gt 0 ]; then
+    # Loop over each pattern or file that was expanded
+    for kind in "${kind[@]}"; do
+        find "$location" -type f -not -path '*/.*' -name "$kind" -user "$(whoami)" -mtime -"$time" 2>/dev/null -exec lsd -la {} \;
+    done
+else
+    # Default find if no patterns are detected (fallback)
+    find "$location" -type f -not -path '*/.*' -user "$(whoami)" -mtime -"$time" 2>/dev/null -exec lsd -la {} \;
+fi

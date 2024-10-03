@@ -1,0 +1,78 @@
+#!/usr/bin/env python3
+
+import sys
+import subprocess
+from Xlib import X, display, protocol
+
+def get_whoami():
+    result = subprocess.run(['whoami'], stdout=subprocess.PIPE)
+    return result.stdout.decode('utf-8').strip()
+
+user = get_whoami()
+
+# Get the process name from command-line argument
+process_name = sys.argv[1]
+
+# Get the PIDs of the process
+try:
+    pids = subprocess.check_output(['pgrep', '-f', process_name]).decode('utf-8').strip().split('\n')
+    pids = [int(pid) for pid in pids]
+except subprocess.CalledProcessError:
+    print("No such process:", process_name)
+    sys.exit(1)
+
+# Open a connection to the X server
+d = display.Display()
+
+# Get the root window
+root = d.screen().root
+
+# Get the list of all windows
+window_ids = root.get_full_property(d.intern_atom('_NET_CLIENT_LIST'), X.AnyPropertyType).value
+
+# List of windows for the specified process
+windows = []
+for window_id in window_ids:
+    window = d.create_resource_object('window', window_id)
+    window_pid = window.get_full_property(d.intern_atom('_NET_WM_PID'), X.AnyPropertyType)
+    if window_pid and window_pid.value[0] in pids:
+        windows.append(window)
+
+if len(windows) <= 1:
+    print("Number of", process_name, "windows:", len(windows))
+else:
+    pass # print("Too many", process_name, "windows. Closing extra windows.")
+
+    home_windows = []
+    other_windows = []
+
+    for window_id in window_ids:
+        window = d.create_resource_object('window', window_id)
+        window_pid = window.get_full_property(d.intern_atom('_NET_WM_PID'), X.AnyPropertyType)
+        window_name = window.get_full_property(d.intern_atom('_NET_WM_NAME'), X.AnyPropertyType)
+        if window_pid and window_pid.value[0] in pids:
+            # If the window name includes the HOME folder, add it to home_windows
+            if window_name and f'{user} - Thunar' == window_name.value.decode('utf-8'):
+                home_windows.append(window)
+            else:
+                other_windows.append(window)
+                
+    if len(home_windows) > 0:
+        keep_window = home_windows[0]
+        close_windows = home_windows[1:] + other_windows
+    else:
+        keep_window = other_windows[0]
+        close_windows = other_windows[1:]
+
+    #print(f"Keeping window {keep_window.id}")
+    for window in close_windows:
+        #print(f"Closing window {window.id}")
+        event = protocol.event.ClientMessage(
+            window = window,
+            client_type = d.intern_atom('WM_PROTOCOLS'),
+            data = (32, [d.intern_atom('WM_DELETE_WINDOW'), X.CurrentTime, 0, 0, 0])
+        )
+        window.send_event(event, event_mask=X.NoEventMask)
+
+d.sync()
+

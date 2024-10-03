@@ -263,49 +263,7 @@ def decode_caesar(input_string,shift):
         else:
             decoded += c
     return decoded
- 
-# def read_input(file_path=None):
-#     if file_path:
-#         try:
-#             with open(file_path, 'rb') as f:
-#                 content = f.read()
-#                 byte_values = [f"{byte:02x}" for byte in content]  # Convert each byte to its 2-digit hex representation
-#                # print("Raw bytes in hexadecimal: ", ' '.join(byte_values))
-#                 return content  # return the raw content if you wish
-#         except FileNotFoundError:
-#             print(colored("File not found", "red"))
-#             sys.exit(1)
-#         except Exception as e:
-#             pass #print(f"An error occurred: {e}")
-#     else:
-#         return input("Please enter a string: ")
-
-# def read_input(file_path=None):
-#     if file_path:
-#         try:
-#             with open(file_path, 'rb') as f:
-#                 content = f.read()
-#                 try:
-#                     if all(c in '0123456789abcdefABCDEF ' for c in input_data):
-#                             # Remove spaces and convert to bytes from hex
-#                         input_data = bytes.fromhex(input_data.replace(' ', ''))
-#                     else:
-#                         # Assume it's a string-representation of bytes and evaluate it
-#                         input_data = eval(input_data)
-#                     # Try to decode it as utf-8 text first
-#                     return input_data 
-#                 except UnicodeDecodeError:
-#                     # If that fails, return the raw bytes
-#                     return content
-#         except FileNotFoundError:
-#             print(colored("File not found", "red"))
-#             sys.exit(1)
-#         except Exception as e:
-#             pass  # Handle or log other exceptions here if you want
-#     else:
-#         return input("Please enter a string: ")
-
-
+   
 
 def read_input(file_path=None):
     print("im inside the function file is:",file_path)
@@ -687,6 +645,7 @@ if __name__ == "__main__":
     parser.add_argument("-p", "--spec", help="Activate Specialized Decoders: Morse Code, Zlib Compression, Brainfuck", action="store_true")
     parser.add_argument("-e", "--english", help="Activate all methods but limit results to English strings", action="store_true")
  
+
     
     args = parser.parse_args()
    
@@ -724,7 +683,10 @@ if __name__ == "__main__":
     if not activated_flag:
         args.system = True
         args.base = True
-        print(colored("No arguments provided. Activating default:","cyan"),"\nSystem\nBase")
+        args.internet = True
+        args.spec = True
+        args.data = True  
+        print(colored("No arguments provided. Activating default:","cyan"),"\nSystem\nBase\nInternet\nData\nSpecial")
 
 
     print("\n" + colored("Input String:", "magenta"))

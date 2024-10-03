@@ -117,44 +117,50 @@ def get_hash(hashfile):
 
 def htj(hashcat_mode):
     hashcat_to_john = {
-            '0': 'raw-md5',                      # MD5
-            '100': 'nt',                         # NTLM
-            '300': 'mssql',                      # MSSQL
-            '400': 'raw-sha1',                   # SHA-1
-            '500': 'md5crypt',                   # md5crypt, MD5(Unix), FreeBSD MD5, Cisco-IOS MD5
-            '900': 'raw-md4',                    # MD4
-            '1000': 'nt',                        # NTLM
-            '1100': 'netntlmv2',                 # NTLMv2
-            '1400': 'raw-sha256',                # SHA-256
-            '1700': 'raw-sha512',                # SHA-512
-            '1800': 'sha512crypt',               # sha512crypt, SHA512(Unix)
-            '2100': 'mscash2',                   # Domain Cached Credentials 2, mscash2
-            '3200': 'bcrypt',                    # bcrypt $2*$, Blowfish(Unix)
-            '3710': 'md5-gen',                   # iSCSI CHAP authentication, MD5(Chap)
-            '1500': 'descrypt',                  # DES(Unix)
-            '16800': 'wpapmkid',                 # WPA/WPA2 PMKID
-            '131': 'mssql12',                    # MSSQL 2012
-            '3000': 'lm',                        # LM hashes
-            '13400': 'krb5pa-sha1',              # Kerberos 5, etype 23, AS-REP
-            '9900': 'racf',                      # RACF
-            '11000': 'postgres',                 # PostgreSQL Challenge-Response Authentication (MD5)
-            '6100': 'whirlpool',                 # Whirlpool
-            '18800': 'pbkdf2-hmac-sha256',       # PBKDF2-HMAC-SHA256
-            '18900': 'pbkdf2-hmac-sha512',       # PBKDF2-HMAC-SHA512
-            '19000': 'pbkdf2-hmac-sha1',         # PBKDF2-HMAC-SHA1
-            '19100': 'keychain',                 # Apple Keychain
-            '19600': 'krb5tgs',                  # Kerberos 5, etype 17, TGS-REP
-            '19800': 'krb5pa-sha1',              # Kerberos 5, etype 17, Pre-Auth
-            '28800': 'krb5pa-sha1',              # Kerberos 5, etype 17, DB
-            '19700': 'krb5tgs',                  # Kerberos 5, etype 18, TGS-REP
-            '19900': 'krb5pa-sha1',              # Kerberos 5, etype 18, Pre-Auth
-            '28900': 'krb5pa-sha1',              # Kerberos 5, etype 18, DB
-            '7500': 'krb5pa-md5',                # Kerberos 5, etype 23, AS-REQ Pre-Auth
-            '13100': 'krb5tgs',                  # Kerberos 5, etype 23, TGS-REP
-            '18200': 'krb5asrep',                # Kerberos 5, etype 23, AS-REP
-        }
-
-    return hashcat_to_john.get(hashcat_mode, "Unknown Hashcat Mode")
+    '0': 'raw-md5',                  # MD5 (Raw Hash)
+    '100': 'raw-sha1',               # SHA-1 (Raw Hash)
+    '131': 'mssql',                  # MSSQL (2000)
+    '300': 'mysql-sha1',             # MySQL 4.1/MySQL 5 (Raw Hash)
+    '400': 'phpass',                 # phpass (WordPress, Joomla, phpBB3) (Generic KDF)
+    '500': 'md5crypt',               # md5crypt, MD5 (Unix), Cisco-IOS $1$ (MD5) (Operating System)
+    '900': 'raw-md4',                # MD4 (Raw Hash)
+    '1000': 'nt',                    # NTLM (Operating System)
+    '1100': 'mscach',                # Domain Cached Credentials (DCC), MS Cache (Operating System)
+    '1400': 'raw-sha256',            # SHA-256 (Raw Hash)
+    '1700': 'raw-sha512',            # SHA-512 (Raw Hash)
+    '1800': 'sha512crypt',           # sha512crypt, SHA512 (Unix) (Operating System)
+    '2100': 'mscash2',               # Domain Cached Credentials 2 (DCC2), MS Cache 2 (Operating System)
+    '3200': 'bcrypt',                # bcrypt $2*$, Blowfish (Unix) (Operating System)
+    '1500': 'descrypt',              # DES (Unix), Traditional DES (Operating System)
+    '16800': 'wpapmkid',             # WPA-PMKID-PBKDF2 (Network Protocol)
+    '3000': 'lm',                    # LM hashes (Operating System)
+    '13400': 'keepass',              # KeePass 1 (AES/Twofish) and KeePass 2 (AES) (Password Manager)
+    '9900': 'racf',                  # RACF (Operating System)
+    '12': 'postgres',                # PostgreSQL (Database Server)
+    '6100': 'whirlpool',             # Whirlpool (Raw Hash)
+    '10900': 'pbkdf2-hmac-sha256',   # PBKDF2-HMAC-SHA256 (Generic KDF)
+    '12100': 'pbkdf2-hmac-sha512',   # PBKDF2-HMAC-SHA512 (Generic KDF)
+    '12000': 'pbkdf2-hmac-sha1',     # PBKDF2-HMAC-SHA1 (Generic KDF)
+    '23100': 'keychain',             # Apple Keychain (Password Manager)
+    '19600': 'krb5tgs',              # Kerberos 5, etype 17, TGS-REP (Network Protocol)
+    '19800': 'krb5pa-sha1',          # Kerberos 5, etype 17, Pre-Auth (Network Protocol)
+    '19700': 'krb5tgs',              # Kerberos 5, etype 18, TGS-REP (Network Protocol)
+    '19900': 'krb5pa-sha1',          # Kerberos 5, etype 18, Pre-Auth (Network Protocol)
+    '7500': 'krb5pa-md5',            # Kerberos 5, etype 23, AS-REQ Pre-Auth (Network Protocol)
+    '13100': 'krb5tgs',              # Kerberos 5, etype 23, TGS-REP (Network Protocol)
+    '18200': 'krb5asrep',            # Kerberos 5, etype 23, AS-REP (Network Protocol)
+     '1750': 'hmac-sha512-$pass',        # HMAC-SHA512 (key = $pass)
+    '1760': 'hmac-sha512-$salt',        # HMAC-SHA512 (key = $salt)
+    '1770': 'sha512-utf16le',           # SHA-512 with UTF-16LE encoding
+    '2400': 'cisco-pix-md5',            # Cisco PIX firewall passwords
+    '2410': 'cisco-asa-md5',            # Cisco ASA firewall passwords
+    '2500': 'wpa-eapol-pbkdf2',         # WPA/WPA2 PBKDF2 (Wi-Fi Protected Access)
+    '2501': 'wpa-eapol-pmk',            # WPA/WPA2 PMKID
+    '2600': 'md5md5',                   # Double MD5
+    '3100': 'oracle-h',                 # Oracle 7+ database passwords
+    '3730': 'dahua',                    # Dahua DVR/NVR password hash
+}
+    return hashcat_to_john.get(hashcat_mode, "Unknown")
  
 
 def main():
