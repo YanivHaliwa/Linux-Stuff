@@ -5,63 +5,84 @@ Welcome to my collection of simple yet powerful Linux tools! These are just ever
 Think of these as your handy toolbox for common Linux tasks. They're not fancy – just practical. I use these regularly to simplify my workflow, and I hope they'll do the same for you.
 
 
-## System Operations
-- **update:** Updates and upgrades system packages, including fixing broken dependencies.
-- **clean:** Cleans up unused packages and dependencies.
-- **sysa:** Manages system services by enabling or disabling them based on the provided arguments.
-- **resetnet:** Resets network settings and services.
-- **sysinfo:** Displays system information such as hostname, user ID, version, and issue.
-- **myusers:** Lists all users and those with home directories.
-
-## Package Management
-- **aptsi:** Searches for installed packages with an option to filter for manually installed ones.
-- **psearch:** Searches for packages with options to include installed packages and outputs their statuses.
-- **updatepips:** Upgrades all installed pip packages and logs any errors.
-- **installdeb:** Installs `.deb` packages using `dpkg` and resolves dependencies.
-- **aptf:** Installs packages listed in a specified file.
-
-## File and Directory Operations
-- **fil:** Analyzes a given file using various tools like `stat`, `file`, `mimetype`, and more.
-- **cati:** Displays the content of an executable file.
-- **loc:** Searches for files in a specified directory based on a regex pattern.
-- **movef:** Moves files from subdirectories to a destination directory and optionally deletes the source folders.
-- **search:** Searches for files or folders based on a specified name.
-- **txtf:** Locates specific text files in the given target folder.
-
-## Text Processing and Manipulation
-- **swf:** Searches for a word or pattern in a specified file.
-- **swd:** Searches for text in files within a specified directory.
-- **hashline:** Joins lines in a file into a single line and saves it.
-- **dupl:** Finds and consolidates duplicate lines in a file.
-
-## Encoding and Decoding
-- **encode:** Encodes text into various formats including base64, hex, ROT47, and more.
-- **decode:** Decodes various encoded text formats including base64, hex, ROT47, Caesar Cipher, etc.
-- **haid:** A Hash Analyzer and Identifier script that helps identify hash types using multiple tools (hashid, Name-That-Hash, hash-identifier, and haiti) and provides relevant information for cracking, including Hashcat modes and John the Ripper formats.
-
-## Network and Security
-- **getlink:** Extracts and prints all links from the provided webpage URL.
-- **portf:** Scans for open ports on a given IP/domain and identifies services running on them.
-- **nmapy:** Automates running initial and detailed Nmap scans on a given IP or domain.
-- **dir_finder:** Searches and identifies valid directories on a given domain using a wordlist.
-- **port:** Checks if a port is in use and offers to kill the processes using it.
-- **soclisten:** Listens on a specified port using `socat`.
-- **socremote:** Connects to a remote host using `socat`.
-- **mvenom:** Creates a payload with `msfvenom` based on user input.
-
-## Translation and Subtitles
-- **trsub:** Downloads and translates subtitles for given video files or directories. for now its to hebrew but you can edit as you want.
-- **trw:** Translates given text to Hebrew using various AI models.
-- **trf:** Translates subtitle files to Hebrew using different AI translators.
-- **vidsubs:** Matches video files with their respective subtitle files.
-- **whis** Transcribes audio files using the Whisper model, supporting both CPU and GPU execution, with options to specify the model and language. Outputs the transcription in SRT format with timestamps.
-- **ytsub:** Downloads and processes subtitles from YouTube videos, with options to specify language and output format.
+## texts_voice
+- **movef**: Moves files from subdirectories to a destination directory, with renaming to avoid conflicts.
+- **trf**: Translates text files (including subtitles) from English to Hebrew using various translation services.
+- **trsub**: Downloads and translates subtitles for video files.
+- **trw**: Translates words or phrases from English to Hebrew using multiple translation services.
+- **vidsubs**: Matches video files with their corresponding subtitle files and renames them for consistency.
+- **whis**: Transcribes audio files using OpenAI's Whisper model with optional GPT enhancement.
+- **whisi**: Transcribes audio using various Whisper models, including Ivrit-AI and faster-whisper versions.
+- **ytsub**: Downloads a YouTube video and transcribes it using the 'whis' script.
 
 
-## Miscellaneous
-- **say:** Converts text to speech and plays it in Hebrew.
-- **gitupdate:** Commits changes to a Git repository and pushes them to the remote master branch.
- 
+## all search
+- **dupl**: Bash script to remove duplicates from a file while preserving order.
+- **loc**: Bash script to search for files in a directory using the `locate` command.
+- **psearch**: Bash script to search for packages in the APT cache, with optional installed package filtering.
+- **search**: Bash script for flexible file and folder searching with various options.
+- **swd**: Python script to search for text in files within a directory, with regex support.
+- **swf**: Python script to search for a word or pattern in a file, displaying line numbers.
+- **txtf**: Bash script to find specific types of sensitive files in a target directory.
 
+## cyber
+- **decode**: A comprehensive decoding tool supporting various encoding formats.
+- **dir_finder**: An asynchronous directory discovery tool for web servers.
+- **encode**: A versatile encoding utility for various formats and hash functions.
+- **getlink**: A simple web scraper to extract links from a given webpage.
+- **haid**: A hash analysis and identification tool.
+- **hashc**: A Bash script wrapper for Hashcat.
+- **hashline**: A Python script for processing hash files.
+- **johng**: A Bash script for cracking GPG-encrypted files using John the Ripper.
+- **johnp**: A Bash script wrapper for John the Ripper.
+- **johns**: A Bash script for cracking SSH private keys using John the Ripper.
+- **johnw**: A Bash script for cracking shadow file passwords using John the Ripper.
+- **johnz**: A Bash script for cracking ZIP file passwords using John the Ripper.
+- **mvenom**: A Python script for generating payloads using Metasploit's msfvenom.
+- **nmapy**: A Python script for automating Nmap scans with initial and detailed scanning phases.
+- **port**: A Bash script for checking and managing processes using a specific port.
+- **portf**: A Python script for port scanning and service detection.
+- **soclisten**: A Python script to set up a listening socket using socat.
+- **socremote**: A Python script to establish a remote connection using socat.
+- **vtf**: A Bash script for scanning files using VirusTotal's API.
+- **vtu**: A Bash script for scanning URLs using VirusTotal's API.
 
- 
+## info
+- **aptsi**: Search installed packages, optionally filter for manually installed ones.
+- **bati**: Display binary file contents using bat.
+- **cati**: Display binary file contents using cat.
+- **fil**: Comprehensive file examination tool (type, hashes, content preview, etc.).
+- **fiup**: Find files modified within a specified time frame.
+- **lf**: List files or directories using lsd.
+- **myusers**: Display user account information.
+- **sysinfo**: Show system information (hostname, ID, version, etc.).
+
+ # System Management
+
+- **update**: Updates and upgrades system packages, including fixing broken dependencies.
+- **clean**: Cleans up unused packages and dependencies.
+- **sysa**: Manages system services by enabling or disabling them.
+- **resetnet**: Resets network settings and services.
+- **active**: Checks if a specified process is running.
+- **onewin**: Manages multiple windows of a specified process, keeping only one open.
+
+# Package Management
+
+- **updatepips**: Upgrades all installed pip packages and logs any errors.
+- **installdeb**: Installs `.deb` packages using `dpkg` and resolves dependencies.
+- **aptf**: Installs packages listed in a specified file.
+- **pix**: Installs a Python package using pipx with dependencies.
+- **pixfile-i**: Installs multiple Python packages from a file using pipx.
+- **pixfile-u**: Uninstalls multiple Python packages from a file using pipx.
+
+# Battery and Power Management
+
+- **batcon**: Analyzes battery discharge patterns and estimates remaining battery time.
+- **batlow**: Monitors battery level and sends notifications for low battery or full charge.
+- **batstat**: Logs battery state changes (charging/discharging) with timestamps.
+
+# Utility Scripts and Tools
+
+- **gitupdate**: Automates the process of updating a Git repository with new changes.
+- **readqr**: Reads and decodes QR codes from image files using a barcode recognition API.
+- **say**: Converts text to speech and plays it in Hebrew.
