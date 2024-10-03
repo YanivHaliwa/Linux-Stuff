@@ -8,12 +8,12 @@ Think of these as your handy toolbox for common Linux tasks. They're not fancy â
 ## texts_voice
 - **movef**: Moves files from subdirectories to a destination directory, with renaming to avoid conflicts.
 - **trf**: Translates text files (including subtitles) from English to Hebrew using various translation services.
-- **trsub**: Downloads and translates subtitles for video files.
+- **trsub**: Downloads and translates subtitles for multiple video files in folder (using script: trf,vidsubs)
 - **trw**: Translates words or phrases from English to Hebrew using multiple translation services.
 - **vidsubs**: Matches video files with their corresponding subtitle files and renames them for consistency.
 - **whis**: Transcribes audio files using OpenAI's Whisper model with optional GPT enhancement.
 - **whisi**: Transcribes audio using various Whisper models, including Ivrit-AI and faster-whisper versions.
-- **ytsub**: Downloads a YouTube video and transcribes it using the 'whis' script.
+- **ytsub**: Downloads a YouTube video and transcribes it (using script: whis).
 
 
 ## all search
@@ -30,7 +30,7 @@ Think of these as your handy toolbox for common Linux tasks. They're not fancy â
 - **dir_finder**: An asynchronous directory discovery tool for web servers.
 - **encode**: A versatile encoding utility for various formats and hash functions.
 - **getlink**: A simple web scraper to extract links from a given webpage.
-- **haid**: A hash analysis and identification tool.
+- **haid**: A hash analysis and identification using multiple tools.
 - **hashc**: A Bash script wrapper for Hashcat.
 - **hashline**: A Python script for processing hash files.
 - **johng**: A Bash script for cracking GPG-encrypted files using John the Ripper.
@@ -40,7 +40,6 @@ Think of these as your handy toolbox for common Linux tasks. They're not fancy â
 - **johnz**: A Bash script for cracking ZIP file passwords using John the Ripper.
 - **mvenom**: A Python script for generating payloads using Metasploit's msfvenom.
 - **nmapy**: A Python script for automating Nmap scans with initial and detailed scanning phases.
-- **port**: A Bash script for checking and managing processes using a specific port.
 - **portf**: A Python script for port scanning and service detection.
 - **soclisten**: A Python script to set up a listening socket using socat.
 - **socremote**: A Python script to establish a remote connection using socat.
@@ -57,7 +56,7 @@ Think of these as your handy toolbox for common Linux tasks. They're not fancy â
 - **myusers**: Display user account information.
 - **sysinfo**: Show system information (hostname, ID, version, etc.).
 
- # System Management
+## System Management
 
 - **update**: Updates and upgrades system packages, including fixing broken dependencies.
 - **clean**: Cleans up unused packages and dependencies.
@@ -65,8 +64,9 @@ Think of these as your handy toolbox for common Linux tasks. They're not fancy â
 - **resetnet**: Resets network settings and services.
 - **active**: Checks if a specified process is running.
 - **onewin**: Manages multiple windows of a specified process, keeping only one open.
+- **port**: A Bash script for checking and managing processes using a specific port.
 
-# Package Management
+## Package Management
 
 - **updatepips**: Upgrades all installed pip packages and logs any errors.
 - **installdeb**: Installs `.deb` packages using `dpkg` and resolves dependencies.
@@ -75,13 +75,13 @@ Think of these as your handy toolbox for common Linux tasks. They're not fancy â
 - **pixfile-i**: Installs multiple Python packages from a file using pipx.
 - **pixfile-u**: Uninstalls multiple Python packages from a file using pipx.
 
-# Battery and Power Management
+## Battery and Power Management
 
 - **batcon**: Analyzes battery discharge patterns and estimates remaining battery time.
 - **batlow**: Monitors battery level and sends notifications for low battery or full charge.
 - **batstat**: Logs battery state changes (charging/discharging) with timestamps.
 
-# Utility Scripts and Tools
+## Utility Scripts and Tools
 
 - **gitupdate**: Automates the process of updating a Git repository with new changes.
 - **readqr**: Reads and decodes QR codes from image files using a barcode recognition API.
