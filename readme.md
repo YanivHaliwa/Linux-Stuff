@@ -4,15 +4,16 @@ Welcome to my collection of simple yet powerful Linux tools! These are just ever
 
 Think of these as your handy toolbox for common Linux tasks. They're not fancy â€“ just practical. I use these regularly to simplify my workflow, and I hope they'll do the same for you.
 
+the files linux_packs_needed.txt and pip_needed.txt - contain list of pip or apt packs that needed for some files to work.
 
-## texts_voice
-- **movef**: Moves files from subdirectories to a destination directory, with renaming to avoid conflicts.
-- **trf**: Translates text files (including subtitles) from English to Hebrew using various translation services.
-- **trsub**: Downloads and translates subtitles for multiple video files in folder (using script: trf,vidsubs)
-- **trw**: Translates words or phrases from English to Hebrew using multiple translation services.
-- **vidsubs**: Matches video files with their corresponding subtitle files and renames them for consistency.
+## subtitle Management
 - **whis**: Transcribes audio files using OpenAI's Whisper model with optional GPT enhancement.
 - **whisi**: Transcribes audio using various Whisper models, including Ivrit-AI and faster-whisper versions.
+- **movef**: Moves files from subdirectories to a destination directory.
+- **vidsubs**: Matches video files with their corresponding subtitle files and renames them for consistency.
+- **trf**: Translates text files (including subtitles) from English to Hebrew using various translation services, including ai models.
+- **trw**: Translates words or phrases from English to Hebrew using multiple translation services, including ai models
+- **trsub**: Downloads subtitles using subliminal and translates them. for multiple video files in folder (using script: trf,vidsubs)
 - **ytsub**: Downloads a YouTube video and transcribes it (using script: whis).
 
 
@@ -26,11 +27,11 @@ Think of these as your handy toolbox for common Linux tasks. They're not fancy â
 - **txtf**: Bash script to find specific types of sensitive files in a target directory.
 
 ## cyber
+- **haid**: A hash analysis and identification using multiple linux tools.
+- **encode**: A versatile encoding utility for various formats and hash functions.
 - **decode**: A comprehensive decoding tool supporting various encoding formats.
 - **dir_finder**: An asynchronous directory discovery tool for web servers.
-- **encode**: A versatile encoding utility for various formats and hash functions.
 - **getlink**: A simple web scraper to extract links from a given webpage.
-- **haid**: A hash analysis and identification using multiple tools.
 - **hashc**: A Bash script wrapper for Hashcat.
 - **hashline**: A Python script for processing hash files.
 - **johng**: A Bash script for cracking GPG-encrypted files using John the Ripper.
