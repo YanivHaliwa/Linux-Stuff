@@ -1,0 +1,14 @@
+anthropic==0.34.2
+argparse==1.4.0
+chardet==5.2.0
+cohere==5.9.3
+colorama==0.4.6
+guessit==3.8.0
+langdetect==1.0.9
+numpy==1.26.4
+openai==1.35.12
+pydub==0.25.1
+tensorflow==2.17.0
+torch==2.4.1
+transformers==4.45.1
+whisper==1.1.10

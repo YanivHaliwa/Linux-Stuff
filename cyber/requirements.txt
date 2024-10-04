@@ -1,0 +1,6 @@
+aiohttp==3.10.5
+argparse==1.4.0
+colorama==0.4.6
+nltk==3.9.1
+requests==2.32.3
+termcolor==2.4.0
