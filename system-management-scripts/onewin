@@ -52,8 +52,10 @@ else:
         window_name = window.get_full_property(d.intern_atom('_NET_WM_NAME'), X.AnyPropertyType)
         if window_pid and window_pid.value[0] in pids:
             # If the window name includes the HOME folder, add it to home_windows
-            if window_name and f'{user} - Thunar' == window_name.value.decode('utf-8'):
+            if window_name and f'{user} - Thunar' == window_name.value:
                 home_windows.append(window)
+            # if window_name and f'{user} - Thunar' == window_name.value.decode('utf-8'):
+            #     home_windows.append(window)
             else:
                 other_windows.append(window)
                 
