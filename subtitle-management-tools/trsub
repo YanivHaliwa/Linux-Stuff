@@ -37,13 +37,43 @@ download_subs() {
     subliminal download -f "$pathi" -l "$lang" --provider opensubtitles --provider opensubtitlesvip --provider podnapisi --provider tvsubtitles $encoding_flag 2>/dev/null 
 }
 
+find_subtitle() {
+    local video_file="$1"
+    local base_name=$(basename "$video_file" | sed 's/\.[^.]*$//')  # Strip extension to get base name
+    local dir_name=$(dirname "$video_file")  # Get the directory containing the video file
+
+    # Check for Hebrew subtitles and exit early if one is found
+    for sub_file in "$dir_name/$base_name"*.srt; do
+        if [[ -f "$sub_file" ]]; then
+            echo -e "\033[1;32mMatching subtitle found: $sub_file\033[0m"
+
+            # Check if the subtitle file ends with .he.srt, .heb.srt, or contains "-heb.srt"
+            if [[ "$sub_file" =~ \.(he|heb)\.srt$ || "$sub_file" =~ -heb\.srt$ ]]; then
+                echo -e "\033[1;33mHebrew subtitle already exists: $sub_file\033[0m"
+                echo ""
+                echo -e "\033[1;33mNothing to translate. Exiting...\033[0m"
+                return 0  # Exit the function early since we found a Hebrew subtitle
+            fi
+        fi
+    done
+
+    # No Hebrew subtitle was found, so proceed with translating non-Hebrew subtitles
+    for sub_file in "$dir_name/$base_name"*.srt; do
+        if [[ -f "$sub_file" ]]; then
+          #  echo -e "\033[1;32mTranslating subtitle file: $sub_file\033[0m"
+            trf -f "$sub_file"  # Translate the subtitle file
+        fi
+    done
+}
 # Determine if the input is a file or directory and process accordingly
 if [ -f "$1" ]; then
     # Handle file
     download_subs "$1" "en" ""
     download_subs "$1" "heb" "-e UTF-8"
+    echo ""
     echo -e "\033[1;32mTranslate subtitles\033[0m"
-    trf -f "$1"
+    find_subtitle "$1"
+
 elif [ -d "$1" ]; then
     # Handle directory
     cd "$1" || exit 1
@@ -54,6 +84,7 @@ elif [ -d "$1" ]; then
         fi
     done
     vidsubs "$1"
+    echo ""
     echo -e "\033[1;32mTranslate subtitles for directory\033[0m"
     trf -d "$1"
     vidsubs "$1"
@@ -62,10 +93,12 @@ else
     exit 1
 fi
 
-status=$?
-if [ $status -eq 0 ]; then
-    echo "Operation complete"
-    exit 0
-else
-    exit 1
-fi
+echo "Operation complete"
+
+# status=$?
+# if [ $status -eq 0 ]; then
+#     echo "Operation complete"
+#     exit 0
+# else
+#     exit 1
+# fi

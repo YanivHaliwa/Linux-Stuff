@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export DISPLAY=:0
-export XAUTHORITY=/home/yaniv/.Xauthority
+export XAUTHORITY=$HOME/.Xauthority
 export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus
 export PULSE_SERVER=/run/user/1000/pulse/native
 

@@ -1,0 +1,101 @@
+#!/usr/bin/env python3
+
+import os
+import ast
+import sys
+from importlib.metadata import distributions, PackageNotFoundError
+from stdlib_list import stdlib_list
+
+def get_imports_from_file(filepath):
+    """Extract import statements from a single Python file."""
+    try:
+        with open(filepath, "r", encoding="utf-8") as file:
+            tree = ast.parse(file.read(), filename=filepath)
+            imports = set()
+            for node in ast.walk(tree):
+                if isinstance(node, ast.Import):
+                    for n in node.names:
+                        imports.add(n.name.split('.')[0])
+                elif isinstance(node, ast.ImportFrom):
+                    if node.module:
+                        imports.add(node.module.split('.')[0])
+            return imports
+    except Exception:
+        return set()
+
+def get_requirements(path):
+    """Recursively find Python files and extract their imports."""
+    all_imports = set()
+    if os.path.isfile(path):
+        all_imports.update(get_imports_from_file(path))
+    elif os.path.isdir(path):
+        for root, _, files in os.walk(path):
+            for file in files:
+                if file.endswith(".py"):
+                    file_path = os.path.join(root, file)
+                    try:
+                        file_imports = get_imports_from_file(file_path)
+                        if file_imports:
+                            all_imports.update(file_imports)
+                    except Exception:
+                        pass
+    else:
+        print(f"Error: {path} is neither a file nor a directory.")
+    
+    return all_imports
+
+def write_requirements_txt(path):
+    """Write found requirements to requirements.txt."""
+    all_imports = get_requirements(path)
+
+    if not all_imports:
+        print("No imports found. requirements.txt will not be generated.")
+        return
+
+    # List of standard libraries
+    stdlib_modules = set(stdlib_list(f"{sys.version_info.major}.{sys.version_info.minor}"))
+
+    # Gather installed pip packages
+    installed_packages = {}
+    for dist in distributions():
+        try:
+            package_name = dist.metadata.get("Name", "").lower()
+            if package_name:
+                installed_packages[package_name] = True
+        except (PackageNotFoundError, AttributeError):
+            continue
+    
+    external_imports = set()
+
+    for imp in all_imports:
+        if imp.lower() in stdlib_modules:
+            pass
+        else:
+            print(f"'{imp}' is considered external.")
+            external_imports.add(imp) 
+           
+    if not external_imports:
+        print("No external dependencies found.")
+        return
+
+    # Write external imports to requirements.txt
+    with open("requirements.txt", "w", encoding="utf-8") as req_file:
+        for module in sorted(external_imports):
+            req_file.write(f"{module}\n")
+    
+    print("\nrequirements.txt generated successfully!")
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Usage: python generate_requirements.py <path_to_file_or_directory>")
+        sys.exit(1)
+
+    input_path = sys.argv[1]
+
+    if input_path == ".":
+        input_path = os.getcwd()
+    if not os.path.exists(input_path):
+        print(f"Error: The file or directory {input_path} does not exist.")
+        sys.exit(1)
+
+    write_requirements_txt(input_path)

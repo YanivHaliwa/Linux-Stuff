@@ -31,7 +31,7 @@ directory=$(cd "$directory" && pwd)
 directory=${directory%/}
 
 # Construct the locate command
-locate_command="plocate -r '^$directory/.*$search_term.*$'"
+locate_command="plocate -r '^$directory/.*$search_term.*$' | grep -vE '/(\.git|trash|Trash|.cache|tmp)/'"
 echo "Running command: $locate_command"
 echo ""
 
@@ -39,3 +39,5 @@ echo ""
 eval $locate_command | while read line; do
     echo -e "\e[1;32m$line\e[0m"
 done
+
+echo ""

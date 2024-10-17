@@ -126,7 +126,7 @@ def transcribe_audio(audio_path, model_name="large-v3", language="he"):
         torch.backends.cudnn.deterministic = False
 
     print(f"Loading {model_name} model...")
-    model = whisper.load_model(model_name, device="cpu", download_root="/home/yaniv/.cache/whisper/")
+    model = whisper.load_model(model_name, device="cpu", download_root=os.path.expanduser("~/.cache/whisper/"))
     model = enable_checkpointing(model)
     model = model.to(device)
 

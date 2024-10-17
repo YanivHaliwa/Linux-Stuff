@@ -1,0 +1,57 @@
+#!/bin/bash
+
+# Run sensors command and store the output in a variable
+sensor_output=$(sensors)
+
+# Extract core temperatures
+core_temps=$(echo "$sensor_output" | grep 'Core' | awk '{print $3}' | tr -d '+°C')
+core_temps_array=($core_temps)
+sum_core_temps=0
+
+for temp in "${core_temps_array[@]}"; do
+    sum_core_temps=$(echo "$sum_core_temps + $temp" | bc)
+done
+
+avg_core_temps=$(echo "scale=2; $sum_core_temps / ${#core_temps_array[@]}" | bc)
+
+# Extract GPU temperatures
+gpu_temps=$(echo "$sensor_output" | grep 'Video:' | awk '{print $2}' | tr -d '+°C')
+gpu_temps_array=($gpu_temps)
+sum_gpu_temps=0
+
+for temp in "${gpu_temps_array[@]}"; do
+    sum_gpu_temps=$(echo "$sum_gpu_temps + $temp" | bc)
+done
+
+avg_gpu_temps=$(echo "scale=2; $sum_gpu_temps / ${#gpu_temps_array[@]}" | bc)
+
+# Extract package temperatures
+pack_temps=$(echo "$sensor_output" | grep 'Package id 0:' | awk '{print $4}' | tr -d '+°C')
+pack_temps_array=($pack_temps)
+sum_pack_temps=0
+
+for temp in "${pack_temps_array[@]}"; do
+    sum_pack_temps=$(echo "$sum_pack_temps + $temp" | bc)
+done
+
+avg_pack_temps=$(echo "scale=2; $sum_pack_temps / ${#pack_temps_array[@]}" | bc)
+
+# Extract NVMe temperatures
+nvme_temps=$(echo "$sensor_output" | grep 'Composite:' | awk '{print $2}' | tr -d '+°C')
+nvme_temps_array=($nvme_temps)
+sum_nvme_temps=0
+
+for temp in "${nvme_temps_array[@]}"; do
+    sum_nvme_temps=$(echo "$sum_nvme_temps + $temp" | bc)
+done
+
+avg_nvme_temps=$(echo "scale=2; $sum_nvme_temps / ${#nvme_temps_array[@]}" | bc)
+
+# Calculate overall average
+overall_avg=$(echo "scale=2; ($avg_core_temps + $avg_gpu_temps + $avg_pack_temps + $avg_nvme_temps) / 4" | bc)
+
+# echo "Average Core Temperature: $avg_core_temps°C"
+# echo "Average GPU Temperature: $avg_gpu_temps°C"
+# echo "Average Package Temperature: $avg_pack_temps°C"
+# echo "Average NVMe Temperature: $avg_nvme_temps°C"
+echo -e "Avg Temp:    \n$overall_avg°C    "
