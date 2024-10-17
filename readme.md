@@ -69,6 +69,7 @@ The files linux_packs_needed.txt and pip_needed.txt contain lists of pip or apt 
 - **swf**: Python script to search for a word or pattern in a file, displaying line numbers.
 - **txtf**: Bash script to find specific types of sensitive files in a target directory.
 - **list**: Creates a file list from a specified directory, with recursive options and exclusions.
+- **compr**: Versatile compression/decompression tool supporting various formats (7z, gzip, bzip2, xz, zstd, zip, rar, lz4, tar).
 
 ## Subtitle Management Tools
 - **movef**: Moves files from subdirectories to a destination directory.
@@ -83,7 +84,6 @@ The files linux_packs_needed.txt and pip_needed.txt contain lists of pip or apt 
 ## System Management Scripts
 - **active**: Checks if a specified process is running.
 - **clean**: Cleans up unused packages and dependencies.
-- **compr**: Versatile compression/decompression tool supporting various formats (7z, gzip, bzip2, xz, zstd, zip, rar, lz4, tar).
 - **heat**: Monitors system temperatures, calculating averages for CPU, GPU, package, and NVMe.
 - **myip**: Displays various IP addresses, including VPN interfaces, WLAN, and public IP.
 - **onewin**: Manages multiple windows of a specified process, keeping only one open.
