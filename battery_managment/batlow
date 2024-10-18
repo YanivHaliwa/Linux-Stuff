@@ -10,7 +10,7 @@ THRESHOLD=10
 CHARGED=100
 
 # Path to the flag file
-FLAG_FILE="$HOME/.cache//full_charge_notified"
+FLAG_FILE="$HOME/.cache/full_charge_notified"
 LOCK_FILE="/tmp/battery_check.lock"
 
 # Create a lock file to prevent overlapping executions
