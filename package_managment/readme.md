@@ -1,3 +1,3 @@
-# package management
+# Package Management
 
-For details on battery management scripts, see the [Battery Management section in the main README](../readme.md#package-management).
+For details on each script, see the [Package Management section in the main README](https://github.com/YanivHaliwa/Linux-Stuff/tree/master?tab=readme-ov-file#package-management).

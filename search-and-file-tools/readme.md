@@ -1,3 +1,3 @@
-# search and file tools
+# Search and File Tools
 
-For details on battery management scripts, see the [Battery Management section in the main README](../readme.md#search-and-file-tools). 
+For details on each script, see the [Search and File Tools section in the main README](https://github.com/YanivHaliwa/Linux-Stuff/tree/master?tab=readme-ov-file#search-and-file-tools). 

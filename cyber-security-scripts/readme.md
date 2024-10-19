@@ -1,3 +1,3 @@
-# cyber security scripts
+# Cyber Security Scripts
 
-For details on each script about cyber secrity scripts, see the [cyber-security-scripts section in the main README](https://github.com/YanivHaliwa/Linux-Stuff/tree/master?tab=readme-ov-file#cyber-security-scripts). 
+For details on each script, see the [Cyber Security Scripts section in the main README](https://github.com/YanivHaliwa/Linux-Stuff/blob/master/README.md#cyber-security-scripts).
