@@ -2,21 +2,26 @@
 
 
 compress_7zip() {
-  local input_path="$1"
-  
-  # Remove trailing slash if present
-  input_path="${input_path%/}"
+  local output_path="compressed_files.7z"
 
-  local output_path="${input_path}.7z"
+  echo "Compressing all files into $output_path with 7-Zip..."
 
-  echo "Compressing $input_path with 7-Zip..."
-  
-  # Compress the file or directory
-  7z a "$output_path" "$input_path" > /dev/null
+  # Compress all files provided as arguments
+  7z a "$output_path" "$@" > /dev/null
 
   echo "Compression complete: $output_path"
 }
 
+compress_zpaq() {
+  local output_path="compressed_files.zpaq"
+
+  echo "Compressing all files into $output_path with ZPAQ..."
+
+  # Compress all files provided as arguments
+  zpaq a "$output_path" "$@" > /dev/null
+
+  echo "Compression complete: $output_path"
+}
 
 
 # Function to extract files based on file type from the 'file' command or by file extension
@@ -56,6 +61,12 @@ extract_file() {
   elif [[ "$file_info" =~ "POSIX tar archive" ]] || [[ "$file_info" =~ "TAR archive data" ]]; then
     echo "Extracting tar file..."
     tar -xf "$file_path"
+  elif [[ "$file_info" =~ "ZPAQ archive" ]]; then
+    echo "Extracting zpaq file..."
+    zpaq x "$file_path"
+  elif [[ "$file_info" =~ "KGB Archiver file" ]]; then
+    echo "Extracting kgb file..."
+    kgb "$file_path"
   else
     # If 'file' command doesn't recognize the type, fall back to extension
     ext="${file_path##*.}"
@@ -97,6 +108,14 @@ extract_file() {
         echo "Extracting tar file based on extension..."
         tar -xf "$file_path"
         ;;
+      zpaq)
+        echo "Extracting zpaq file based on extension..."
+        zpaq x "$file_path"
+        ;;
+      kgb)
+        echo "Extracting kgb file based on extension..."
+        kgb "$file_path"
+        ;;
       *)
         echo "Unknown file type or unsupported extension: $ext"
         ;;
@@ -106,19 +125,29 @@ extract_file() {
 
 
 # Parse command line options
-if [ "$1" == "-c" ]; then
+if [ "$1" == "-cz" ]; then
   if [ -z "$2" ]; then
-    echo "Usage: $0 -c <file_to_compress>"
+    echo "Usage: $0 -cz <files_to_compress>"
     exit 1
   fi
-  compress_7zip "$2"
+  compress_7zip "${@:2}"
   exit 0
 fi
 
-# Check if the file path is provided for decompression
+if [ "$1" == "-cq" ]; then
+  if [ -z "$2" ]; then
+    echo "Usage: $0 -cq <files_to_compress>"
+    exit 1
+  fi
+  compress_zpaq "${@:2}"
+  exit 0
+fi
+
+# Check if the file path is provided for decompression or compression
 if [ -z "$1" ]; then
-  echo "Usage: $0    <file_to_extract>"
-  echo "       $0 -c <file_to_compress>"
+  echo "Usage: compr <file_to_extract>"
+  echo "       compr -cz <files_to_compress_with_7zip>"
+  echo "       compr -cq <files_to_compress_with_zpaq>"
   exit 1
 fi
 
