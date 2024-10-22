@@ -144,12 +144,22 @@ if [ "$1" == "-cq" ]; then
 fi
 
 # Check if the file path is provided for decompression or compression
-if [ -z "$1" ]; then
+if [ -z "$1" ] || [ "$1" == "-h" ] || [ "$1" == "--help" ]; then
   echo "Usage: compr <file_to_extract>"
   echo "       compr -cz <files_to_compress_with_7zip>"
   echo "       compr -cq <files_to_compress_with_zpaq>"
   exit 1
 fi
+
+if [ ! -f "$1" ] && [ "$1" != "-cz" ] && [ "$1" != "-cq" ]; then
+  echo "Error: '$1' is not a valid file or command."
+  echo "Usage: compr <file_to_extract>"
+  echo "       compr -cz <files_to_compress_with_7zip>"
+  echo "       compr -cq <files_to_compress_with_zpaq>"
+  exit 1
+fi
+fi
+
 
 
 # Call the extraction function with the provided file path
