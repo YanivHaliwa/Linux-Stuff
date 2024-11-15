@@ -786,8 +786,8 @@ if __name__ == "__main__":
             print_decoded_output(jwt,"JWT Tokens", is_english)
 
 
-    if  args.chiper or args.all or args.english:
-        xor=brute_force_single_byte_xor(input_string)
+    # if  args.chiper or args.all or args.english:
+    #     xor=brute_force_single_byte_xor(input_string)
     
     if args.chiper or args.all or args.english:
         atbash=decode_atbash(input_string)

@@ -82,11 +82,20 @@ def analyze_hash(hashfile):
 def choose_hash_type(filename, search_term):
     choice = 0
     matching_lines = []
+
+    # Define equivalencies for common hash names
+    hash_equivalents = {
+        "sha-256": "sha2-256",
+        "sha-512": "sha2-512",
+    }
+
+    # Check if the search term has an equivalent and normalize it
+    normalized_search = hash_equivalents.get(search_term.lower(), search_term.lower()).replace('-', '')
+
     try:
         with open(filename, 'r') as file:
             for line in file:
                 normalized_line = line.lower().replace('-', '')
-                normalized_search = search_term.lower().replace('-', '')
                 if normalized_search in normalized_line:
                     matching_lines.append(line.strip())
     except FileNotFoundError:
@@ -96,15 +105,24 @@ def choose_hash_type(filename, search_term):
     if not matching_lines:
         return None
     if len(matching_lines) == 1:
-        chosen_line = matching_lines[0].split('|')[0].strip()
+        chosen_line = matching_lines[0]
     else:
         for i, line in enumerate(matching_lines):
             print(f"{i + 1}. {line}")
         choice = int(input(f"{Fore.YELLOW}Choose a hash type (1-{len(matching_lines)}): {Style.RESET_ALL}"))
         chosen_line = matching_lines[choice - 1]
-    hash_type_code = chosen_line.split('|')[0].strip()
-    hash_type = matching_lines[choice - 1].split('|')[1].strip()
+
+    # Ensure chosen_line has the correct format with at least two parts
+    parts = chosen_line.split('|')
+    if len(parts) < 2:
+        print("Error: Chosen line format is incorrect in hash_mode.txt.")
+        return None
+
+    hash_type_code = parts[0].strip()
+    hash_type = parts[1].strip()
     return hash_type_code, hash_type
+
+
  
 
 def get_hash(hashfile):
@@ -176,7 +194,7 @@ def main():
         else:
             analyze_hash(args.hashfile)
             print("")
-            user_hash_type = input(f"{Fore.CYAN}Enter the hash type name or part of it: {Style.RESET_ALL}")
+            user_hash_type = input(f"{Fore.CYAN}Enter the hash type name or part of it /  or HC code: {Style.RESET_ALL}")
             result = choose_hash_type(type_file, user_hash_type)
             if result is None:
                 print(f"{Fore.RED}No matching hash types found. Exiting.'{Style.RESET_ALL}")

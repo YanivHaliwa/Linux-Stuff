@@ -17,7 +17,7 @@ if [ -z "$file" ]; then
 fi
 
 # Run the hashcat command with the provided arguments
-hashcat -w 4 -O --status -m "$type" "$file" "$wordlist" 2>/dev/null
+hashcat -a 0 -w 4 -O --status -m "$type" "$file" "$wordlist" 2>/dev/null
 
 echo ""
 echo "Last cracked passwords:"
