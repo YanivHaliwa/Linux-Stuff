@@ -1,0 +1,3 @@
+#!/bin/bash
+pack=$1
+pipx install $pack --include-deps

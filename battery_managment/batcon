@@ -1,0 +1,142 @@
+#!/usr/bin/env python3
+
+from datetime import datetime, timedelta
+import os
+
+log_file_path = os.path.expanduser("~/.cache/battery_state_log.txt")
+if not os.path.exists(log_file_path):
+    open(log_file_path, "w").close()
+
+
+# ANSI color codes for colorful output
+RED = '\033[91m'
+GREEN = '\033[92m'
+YELLOW = '\033[93m'
+BLUE = '\033[94m'
+MAGENTA = '\033[95m'
+CYAN = '\033[96m'
+RESET = '\033[0m'
+
+
+# Function to format duration into hours and minutes if over 60 minutes
+def format_duration(minutes):
+    sign = "-" if minutes < 0 else ""
+    minutes = abs(minutes)
+    if minutes >= 60:
+        hours = int(minutes // 60)
+        mins = int(minutes % 60)
+        return f"{sign}{hours}:{mins:02d}"  # Format as hours:minutes with leading zero for minutes
+    else:
+        return f"{sign}{minutes:.1f}"  # Show minutes as is if less than 60
+
+
+# Function to parse log lines and calculate durations
+def calculate_durations(log_file_path, max_display=10):
+    with open(log_file_path, "r") as file:
+        lines = file.readlines()
+
+    # List to store discharge durations in minutes
+    discharge_durations = []
+    last_discharge_time = None
+
+    # Parse each line to find discharge and charge pairs
+    for line in lines:
+        # Extract timestamp and state from the log line
+        try:
+            timestamp_str, state = line.strip().split(" - State changed to: ")
+            timestamp = datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S")
+        except ValueError:
+            continue  # Skip lines that don't match the expected format
+
+        # Track discharging start time
+        if state == "discharging":
+            last_discharge_time = timestamp
+
+        # Calculate duration if charging starts after discharging
+        elif state == "charging" and last_discharge_time:
+            duration = (timestamp - last_discharge_time).total_seconds() / 60  # Duration in minutes
+
+            # Check conditions: same day and duration between 31 minutes and 3 hours
+            if last_discharge_time.date() == timestamp.date() and 31 <= duration <= 180:
+                discharge_durations.append(duration)
+
+            last_discharge_time = None  # Reset after checking the event
+
+    # Calculate the average discharge duration
+    average_duration = sum(discharge_durations) / len(discharge_durations) if discharge_durations else 0
+
+    # Display results
+    total_durations = len(discharge_durations)
+    print(f"{CYAN}Total Recorded Discharge Durations:{RESET} {total_durations}")
+
+    # Display only the last few durations based on max_display
+    if total_durations > 0:
+        # Format the last few durations using the format_duration function
+        formatted_durations = [format_duration(duration) for duration in discharge_durations[-max_display:]]
+        print(f"{CYAN}Last {min(max_display, total_durations)} Discharge Durations:{RESET} {formatted_durations}")
+        print(f"{CYAN}Average Duration Without Charge:{RESET} {format_duration(average_duration)}")
+  
+    else:
+        print(f"{RED}No discharge durations recorded.{RESET}")
+        average_duration = 0  # Ensure average_duration is zero if no data
+
+    # Determine the current state and time since the last state change
+    current_state, last_state_change_time = get_current_state_and_time(lines)
+    if current_state and last_state_change_time:
+        time_since_last_change = (datetime.now() - last_state_change_time).total_seconds() / 60  # in minutes
+        print(f"\n{YELLOW}Current State:{RESET} {current_state.capitalize()}")
+        print(f"{YELLOW}Time Since Last State Change:{RESET} {format_duration(time_since_last_change)}")
+
+        if current_state == "discharging":
+            # Estimate time left based on average_duration
+            if average_duration > 0:
+                time_left = average_duration - time_since_last_change
+                if time_left > 0:
+                    print(f"{YELLOW}Estimated Time Remaining Before Battery is Depleted:{RESET} {format_duration(time_left)}")
+                else:
+                    print(f"{RED}Battery may be depleted soon.{RESET}")
+            else:
+                print(f"{RED}Insufficient data to estimate time remaining.{RESET}")
+    else:
+        print(f"{RED}Could not determine the current state.{RESET}")
+
+    cleanup_log_file(log_file_path, lines)
+
+
+# Function to determine the current state and time since last change
+def get_current_state_and_time(lines):
+    for line in reversed(lines):
+        try:
+            timestamp_str, state = line.strip().split(" - State changed to: ")
+            timestamp = datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S")
+            return state, timestamp
+        except ValueError:
+            continue  # Skip lines that don't match the expected format
+    return None, None  # If no valid lines found
+
+
+# Function to clean up the log file if it has more than 100 lines
+def cleanup_log_file(log_file_path, lines):
+    if len(lines) > 100:
+        print("Log file has more than 100 lines. Cleaning up the log file...")
+
+        # Ensure we start deletion at a "charging" line and delete pairs
+        delete_until_index = 50
+        while delete_until_index < len(lines) and not lines[delete_until_index].strip().endswith("charging"):
+            delete_until_index += 1
+
+        # Delete lines until the next "discharging" line to complete the pair
+        delete_until_index += 1
+        while delete_until_index < len(lines) and not lines[delete_until_index].strip().endswith("discharging"):
+            delete_until_index += 1
+
+        # Keep the remaining lines
+        remaining_lines = lines[delete_until_index + 1:]
+
+        # Write the remaining lines back to the file
+        with open(log_file_path, "w") as file:
+            file.writelines(remaining_lines)
+
+# Example usage
+# Run the calculation with default display of last 10 durations
+calculate_durations(log_file_path)

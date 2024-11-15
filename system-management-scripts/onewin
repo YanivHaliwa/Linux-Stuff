@@ -1,0 +1,95 @@
+#!/usr/bin/env python3
+
+import subprocess
+from Xlib import X, display, protocol, error
+import sys 
+
+
+def get_whoami():
+    result = subprocess.run(['whoami'], stdout=subprocess.PIPE)
+    return result.stdout.decode('utf-8').strip()
+
+def get_process_name(pid):
+    try:
+        return subprocess.check_output(['ps', '-p', str(pid), '-o', 'comm=']).decode('utf-8').strip()
+    except subprocess.CalledProcessError:
+        return None
+
+choosen_process=None
+
+if len(sys.argv) > 1:
+    choosen_process = sys.argv[1]
+    
+else:
+    choosen_process = None
+
+if len(sys.argv) > 1 and (sys.argv[1] == "-h" or sys.argv[1] == "--help"):
+    print("Usage: onewin  {to kill all duplicates} \nOR\nonewin <process_name> {to kill specific duplicated processes}")
+    sys.exit(1)
+
+
+user = get_whoami()
+
+# Open a connection to the X server
+d = display.Display()
+
+# Get the root window
+root = d.screen().root
+
+# Get the list of all windows
+window_ids = root.get_full_property(d.intern_atom('_NET_CLIENT_LIST'), X.AnyPropertyType).value
+
+# Dictionary to group windows by their process names
+windows_by_process = {}
+
+exclude_processes = ['xfce4-panel', 'xfdesktop', 'gnome-system-mo']  # Processes to exclude
+
+for window_id in window_ids:
+    window = d.create_resource_object('window', window_id)
+    pid = window.get_full_property(d.intern_atom('_NET_WM_PID'), X.AnyPropertyType)
+    if pid:
+        process_name = get_process_name(pid.value[0])
+        if process_name and process_name not in exclude_processes:  # Check if process should be excluded
+            if process_name not in windows_by_process:
+                windows_by_process[process_name] = []
+            windows_by_process[process_name].append(window)
+
+# Display process names and their associated windows
+print("Active windows:")
+for process, windows in windows_by_process.items():
+    print(f"{process}")
+
+# Closing duplicates based on process name and window title preferences
+for process, windows in windows_by_process.items():
+    if len(windows) > 1:
+        keep_window = windows[0]  # Default: keep the first window
+        if process == "Thunar":
+            # Keep the window titled "yaniv - Thunar"
+            for window in windows:
+                title = window.get_full_property(d.intern_atom('_NET_WM_NAME'), X.AnyPropertyType)
+                if title and title.value.decode('utf-8') == "yaniv - Thunar":
+                    keep_window = window
+                    break
+
+        close_windows = [w for w in windows if w != keep_window]
+        for window in close_windows:
+            try:
+                wm_delete_window = d.intern_atom('WM_DELETE_WINDOW')
+                wm_protocols = d.intern_atom('WM_PROTOCOLS')
+                event = protocol.event.ClientMessage(
+                    window=window,
+                    client_type=wm_protocols,
+                    data=(32, [wm_delete_window, X.CurrentTime, 0, 0, 0])
+                )
+                if choosen_process is None:
+                    window.send_event(event, event_mask=X.NoEventMask)
+                    print(f"Sent close event to process {process}")
+                else:
+                    if choosen_process.lower() in process.lower():
+                        window.send_event(event, event_mask=X.NoEventMask)
+                        print(f"Sent close event to process {process}")
+            except error.XError as e:
+                pass#print(f"Error sending close event to window {hex(window.id)}: {e}")
+            except Exception as e:
+                pass#print(f"Unexpected error: {e}")
+d.sync()

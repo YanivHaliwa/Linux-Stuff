@@ -1,0 +1,21 @@
+#!/bin/bash
+
+echo "314674" | sudo -S airmon-ng stop wlan0mon > /dev/null 2>&1
+sudo airmon-ng stop wlan0 > /dev/null 2>&1
+
+interface_name=$(ip -o link show | grep -E 'wlan0|wlan0mon' | awk '{print $2}' | tr -d ':')
+if [ "$interface_name" == "wlan0mon" ]; then
+    sudo ip link set wlan0mon name wlan0
+fi
+
+sudo ip link set wlan0 down  2>&1                  
+sudo iwconfig wlan0 mode managed 2>&1
+sudo ip link set wlan0 up 2>&1
+
+sudo systemctl daemon-reload
+sudo systemctl restart NetworkManager
+sudo systemctl restart networking
+sudo systemctl restart systemd-resolved 
+
+
+

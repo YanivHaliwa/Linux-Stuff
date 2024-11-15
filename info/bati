@@ -1,0 +1,8 @@
+#!/bin/bash
+BINARY_PATH=$(which "$1")
+if command -v "$BINARY_PATH" &> /dev/null
+then
+    batcat "$BINARY_PATH"
+else
+    echo "Command not found."
+fi
