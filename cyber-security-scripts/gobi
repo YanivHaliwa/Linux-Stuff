@@ -40,6 +40,7 @@ sanitized_url=${sanitized_url////_}
 sanitized_url=${sanitized_url//:/_}
 
 resultfile="$current_directory/gobuster_result_$ip.txt"
+touch $resultfile
 
 # trap 'echo ""; echo "Gobuster interrupted. Do you want to start the download for the discovered directories? (y/n)"; read response; if [[ "$response" == "y" ]]; then process_results; fi; exit 0' SIGINT
 
@@ -47,7 +48,7 @@ echo ""
 echo ""
 echo "Starting gobuster on $domain (IP: $ip) with wordlist $dics..."
 
-gobuster dir -u $target_url -w $2 -t 70 | tee -a $resultfile
+gobuster dir -u $target_url -w $2 -t 100 -s 200,301,302,403,401,500 --status-codes-blacklist "" | tee -a $resultfile 
 
 echo "Gobuster is done. Do you want to start the download for the discovered directories? (y/n)"
 read response

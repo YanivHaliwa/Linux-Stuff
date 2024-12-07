@@ -67,9 +67,22 @@ for process, windows in windows_by_process.items():
             # Keep the window titled "yaniv - Thunar"
             for window in windows:
                 title = window.get_full_property(d.intern_atom('_NET_WM_NAME'), X.AnyPropertyType)
-                if title and title.value.decode('utf-8') == "yaniv - Thunar":
-                    keep_window = window
-                    break
+                if title:
+                    title_value = title.value
+                    if isinstance(title_value, bytes):
+                        title_value = title_value.decode('utf-8')
+                    elif isinstance(title_value, str):
+                        title_value = title_value
+                    if title_value == "yaniv - Thunar":
+                        keep_window = window
+                        break
+        # if process == "Thunar":
+        #     # Keep the window titled "yaniv - Thunar"
+        #     for window in windows:
+        #         title = window.get_full_property(d.intern_atom('_NET_WM_NAME'), X.AnyPropertyType)
+        #         if title and title.value.decode('utf-8') == "yaniv - Thunar":
+        #             keep_window = window
+        #             break
 
         close_windows = [w for w in windows if w != keep_window]
         for window in close_windows:

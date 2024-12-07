@@ -20,5 +20,5 @@ fi
 
 echo ""
 echo "last cracked:"
-tail -n 2$HOME/.john/john.pot
+tail -n 2 $HOME/.john/john.pot
  

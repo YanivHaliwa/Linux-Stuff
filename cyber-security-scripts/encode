@@ -85,7 +85,11 @@ def encode_ascii(text):
 
 # Function to encode text to Octal
 def encode_octal(text):
-    return ' '.join(oct(ord(c)) for c in text)
+    octal1=' '.join(oct(ord(c)) for c in text)
+    octal2='0o' + ''.join(oct(ord(c))[2:] for c in text)
+    combined_octal = f"{octal1}  ( {octal2} )"
+    return combined_octal
+
 
 # Function to encode text to Binary
 def encode_binary(text):
@@ -93,16 +97,18 @@ def encode_binary(text):
 
 # Function to encode text to Hexadecimal
 def encode_hex(text):
-    return ' '.join(hex(ord(c)) for c in text)
+    hex1=' '.join(hex(ord(c)) for c in text)
+    hex2='0x' + ''.join(f'{ord(c):02x}' for c in text)
+    combined_hex = f"{hex1}  ( {hex2} )"
+    return combined_hex
 
 # Function to encode text to Hex dump
 def encode_hexdump(text):
-    hex_values = ['{:02x}'.format(ord(c)) for c in text]
-    return ' '.join(hex_values)
+    hexdump1 = ' '.join('{:02x}'.format(ord(c)) for c in text)
+    hexdump2 = ''.join('{:02x}'.format(ord(c)) for c in text)
+    combined_hexdump = f"{hexdump1}  ( {hexdump2} )"
+    return combined_hexdump
 
-# Function to encode text to Decimal
-def encode_decimal(text):
-    return ' '.join(str(ord(c)) for c in text)
 
 # Function to encode text to Base16
 def encode_base16(text):
@@ -195,12 +201,16 @@ def contains_alpha(s):
 
     return any(c.isalpha() for c in s)
 
+def to_unicode_encoding(input_string):
+    # Convert each character to its Unicode code point and format as \uXXXX
+    unicode_encoded = ''.join(f'\\u{ord(char):04x}' for char in input_string)
+    return unicode_encoded
 
      
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser(description=colored("This script encodes to the following formats:", "yellow") + " ASCII, Octal, Binary, Hexadecimal, Hex dump, Decimal, Base16, Base32, Base58, Base64, Base85, URL Encoding, ROT47, Caesar Cipher (All 26 shifts), Morse Code, UUencoding, Quoted-Printable, Punycode, JWT Tokens, Zlib Compression, Atbash Cipher, MD4, MD5, SHA-1, SHA-256, SHA-384, SHA-512, CRC32.")
-    parser.add_argument('-c','--basic', action='store_true', help='Include basic encodings: ASCII, Octal, Binary, Hexadecimal, Hex dump, and Decimal')    
+    parser = argparse.ArgumentParser(description=colored("This script encodes to the following formats:", "yellow") + " ASCII, Octal, Binary, Hexadecimal, Hex dump, Base16, Base32, Base58, Base64, Base85, URL Encoding, ROT47, Caesar Cipher (All 26 shifts), Morse Code, UUencoding, Quoted-Printable, Punycode, JWT Tokens, Zlib Compression, Atbash Cipher, MD4, MD5, SHA-1, SHA-256, SHA-384, SHA-512, CRC32.")
+    parser.add_argument('-c','--basic', action='store_true', help='Include basic encodings: ASCII, Octal, Binary, Hexadecimal, Hex dump')    
     parser.add_argument('-b','--base', action='store_true', help='Include Base encodings: Base16, Base32, Base58, Base64, Base85')
     parser.add_argument('-s','--hash', action='store_true', help='Include Hash encodings:  MD4, MD5, SHA-1, SHA-256, SHA-384, SHA-512, CRC32')
     parser.add_argument('-d','--advanced', action='store_true', help='Include advanced encodings: URL Encoding, ROT47, Caesar Cipher, UUencoding, Quoted-Printable, Punycode, Zlib Compression, Atbash Cipher, Morse Code, and JWT Tokens.')   
@@ -228,8 +238,6 @@ if __name__ == '__main__':
 
     os.system('clear')
 
-    print("\n" + colored("Input String:", "magenta"))
-    print(colored(text_to_encode,"blue"))
     
     chars=contains_alpha(text_to_encode)
     if not chars: 
@@ -239,14 +247,35 @@ if __name__ == '__main__':
     if args.file_path: 
         argu -= 1  # Reduce the count by 1 if a file path is provided
 
+    activated_flag = False
+
     if argu <= 1:
         args.base = True
         args.hash = True
+        args.basic = True
+        print(colored("No arguments provided. Activating default:","cyan"),"\nBasic\nBase\nHash")
+    else:        
+        for arg, value in vars(args).items():
+            if value is True:
+                # If this is the first activated decoder, print the header
+                if not activated_flag:
+                    print(colored("Activated encoders:","cyan"))
+                    activated_flag = True
+                print(f"{arg}")
 
+    print("\n" + colored("Input String:", "magenta"))
+    print(colored(text_to_encode,"blue"))
+    
+    if args.basic or args.all:  
+        unicode_encode=to_unicode_encoding(text_to_encode)
+        if unicode_encode and unicode_encode != text_to_encode:
+            print("\nUnicode:")
+            print(colored(unicode_encode, 'yellow'))
+    
     if args.basic or args.all:
         eascii=encode_ascii(text_to_encode)
         if eascii and  eascii!=text_to_encode:
-            print("\nASCII:")
+            print("\nASCII (Decimal):")
             print(colored(eascii, 'yellow'))
      
         eoctal = encode_octal(text_to_encode)
@@ -268,11 +297,6 @@ if __name__ == '__main__':
         if ehexdump.strip() and ehexdump != text_to_encode:
             print("\nHex dump:")
             print(colored(ehexdump, 'yellow'))
-
-        edecimal = encode_decimal(text_to_encode)
-        if edecimal and edecimal != text_to_encode:
-            print("\nDecimal:")
-            print(colored(edecimal, 'yellow'))
 
     if args.base or args.all:
         ebase16 = encode_base16(text_to_encode)

@@ -20,11 +20,51 @@ import traceback
 import magic
 import string
  
+ 
+import nltk
+import warnings
+from functools import lru_cache
+warnings.filterwarnings('ignore')
 
-print("download words:\n")
-nltk.download('words')
-print("finish")
+# Silent downloads of just what we need
+needed_packages = ['words', 'names']
+for package in needed_packages:
+    nltk.download(package, quiet=True)
+
+@lru_cache(maxsize=None)  # Cache the word set
+def get_word_set():
+    word_set = set()
     
+    # Use the most common and relevant corpora
+    corpora = [
+        nltk.corpus.words,
+        nltk.corpus.names,    
+    ]
+    
+    # Collect words efficiently
+    for corpus in corpora:
+        try:
+            word_set.update(w.lower() for w in corpus.words())
+        except:
+            continue
+    
+    return word_set
+
+def en(text):
+    all_words = get_word_set() 
+    text_words = set(text.lower().split())
+    
+    # If it's a single word
+    if len(text_words) == 1:
+        return list(text_words)[0] in all_words
+    
+    # If it's multiple words
+    intersection = text_words.intersection(all_words)
+ 
+    return len(intersection) >=1   
+
+
+
 
 global result
 result=None
@@ -36,10 +76,6 @@ global fbase64,fbase85,fbase58
 fbase64 = [None, None]  
 fbase85 = [None, None] 
 fbase58=None
-
-
-english_words = set(words.words())
- 
 
 def guess_encoding(s):
     global fbase64,fbase85
@@ -69,12 +105,6 @@ def guess_encoding(s):
     # Hexadecimal
     hexi=decode_hex(s)
     check_and_append(hexi, "Hexadecimal")
-
-    # Decimal
-    decode_decimal
-    decimal_a = split_sequence_based_on_delimiter(s)
-    decimal_c = decode_decimal(decimal_a)
-    check_and_append(decimal_c, "Decimal")
 
     # Base16
     base16_c = decode_base16(s)
@@ -122,17 +152,6 @@ def guess_encoding(s):
 
     return guesses, final_accuracy
 
-def en(text):
-    text_words = set(text.lower().split())
-    
-    # If it's a single word
-    if len(text_words) == 1:
-        return list(text_words)[0] in english_words
-    
-    # If it's multiple words
-    intersection = text_words.intersection(english_words)
- 
-    return len(intersection) >=1  
 
 def decode_brainfuck(code):
     valid_commands = ['>', '<', '+', '-', '.', ',', '[', ']']
@@ -199,15 +218,6 @@ def split_sequence_based_on_delimiter(input_string):
         return input_string.split()
  
 
-def decode_decimal(decimal_values):
-    try:
-        return ''.join([chr(int(i)) for i in decimal_values if 0 <= int(i) <= 0x10FFFF])  
-    except ValueError:
-        return None
-    except OverflowError:
-        return None
-    except:
-        return None
 
 
 def identify_morse_delimiters(input_string):
@@ -630,20 +640,26 @@ def brute_force_single_byte_xor(ciphertext_str):
                     result=True
         except UnicodeDecodeError:
             continue  # Skip non-UTF-8 results
- 
+def decode_unicode_escape(unicode_string):
+    # Decode the escaped Unicode string into its original form
+    decoded_string = unicode_string.encode('utf-8').decode('unicode_escape')
+    return decoded_string
+
 
 if __name__ == "__main__":
     # global fbase64
     parser = argparse.ArgumentParser(description=colored("This script decodes the following formats:", "yellow"))
     parser.add_argument("file_path", help="Path to the file to be decoded", nargs='?', default=None)
-    parser.add_argument("-a", "--all", help="Activate all decoding methods", action="store_true")
-    parser.add_argument("-c", "--chiper", help="Activate Classic Cipher Decoders: ROT47, Caesar Cipher (all 26 shifts), Atbash Cipher, XOR", action="store_true")
+    parser.add_argument("-a", "--all", help="Activate all decoding methods [except XOR]", action="store_true")
+    parser.add_argument("-c", "--chiper", help="Activate Classic Cipher Decoders: ROT47, Caesar Cipher (all 26 shifts), Atbash Cipher", action="store_true")
     parser.add_argument("-i", "--internet",  help="Activate URL and Internet Format Decoders: URL Encoding, Punycode, JWT Tokens", action="store_true")
-    parser.add_argument("-s", "--system",  help="Activate Numeral System Decoders: ASCII, Octal, Binary, Decimal, Hexadecimal", action="store_true")
+    parser.add_argument("-s", "--system",  help="Activate Numeral System Decoders: ASCII, Octal, Binary, Hexadecimal,Unicode", action="store_true")
     parser.add_argument("-b", "--base", help="Activate Base Decoders: Base16, Base32, Base58, Base64, Base85", action="store_true")
     parser.add_argument("-d", "--data", help="Activate Data Serialization Format Decoders: Hex dump, UUencoding, Quoted-Printable", action="store_true")
     parser.add_argument("-p", "--spec", help="Activate Specialized Decoders: Morse Code, Zlib Compression, Brainfuck", action="store_true")
     parser.add_argument("-e", "--english", help="Activate all methods but limit results to English strings", action="store_true")
+    parser.add_argument("-x", "--xor", help="Activate decoder: XOR chiper", action="store_true")
+
  
 
     
@@ -693,6 +709,12 @@ if __name__ == "__main__":
     print(input_string)
 
     if args.system or args.all or args.english:
+        unicode=decode_unicode_escape(input_string)
+        if unicode:
+            is_english=en(unicode)
+            print_decoded_output(unicode, "Unicode", is_english)
+        
+    if args.system or args.all or args.english:
         ascii_value = ascii_to_text(input_string)
         if ascii_value:
             is_english = en(ascii_value)
@@ -716,12 +738,7 @@ if __name__ == "__main__":
                 is_english=en(hexi)
                 print_decoded_output(hexi, "Hex", is_english) 
     
-    if args.system or args.all or args.english:
-        decimal_values = split_sequence_based_on_delimiter(input_string)
-        decimali = decode_decimal(decimal_values)
-        if decimali:
-            is_english=en(decimali)
-            print_decoded_output(decimali, "Decimal", is_english)
+
     
     if args.base or args.all or args.english:
         base16_value=decode_base16(input_string)
@@ -786,8 +803,8 @@ if __name__ == "__main__":
             print_decoded_output(jwt,"JWT Tokens", is_english)
 
 
-    # if  args.chiper or args.all or args.english:
-    #     xor=brute_force_single_byte_xor(input_string)
+    if  args.xor or args.english:
+        xor=brute_force_single_byte_xor(input_string)
     
     if args.chiper or args.all or args.english:
         atbash=decode_atbash(input_string)

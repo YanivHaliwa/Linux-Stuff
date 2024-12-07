@@ -83,11 +83,11 @@ elif [ -d "$1" ]; then
             download_subs "$video_file" "heb" "-e UTF-8"
         fi
     done
-    vidsubs "$1"
+    # vidsubs "$1"
     echo ""
     echo -e "\033[1;32mTranslate subtitles for directory\033[0m"
     trf -d "$1"
-    vidsubs "$1"
+    # vidsubs "$1"
 else
     echo "Error: '$1' is neither a file nor a directory."
     exit 1
