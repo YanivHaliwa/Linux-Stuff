@@ -57,7 +57,8 @@ def calculate_durations(log_file_path, max_display=10):
             duration = (timestamp - last_discharge_time).total_seconds() / 60  # Duration in minutes
 
             # Check conditions: same day and duration between 31 minutes and 3 hours
-            if last_discharge_time.date() == timestamp.date() and 31 <= duration <= 180:
+            # if last_discharge_time.date() == timestamp.date() and 31 <= duration <= 180:
+            if 10 <= duration <= 180: 
                 discharge_durations.append(duration)
 
             last_discharge_time = None  # Reset after checking the event

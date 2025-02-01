@@ -7,7 +7,7 @@ if [ -z "$1" ]; then
 fi
 
 # Perform the VirusTotal scan
-scan_result=$(vt scan file "$1")
+scan_result=$(vtcli scan file "$1")
  
 # Extract the hash from the scan result
 hash=$(echo "$scan_result" | awk '{print $2}')
@@ -18,7 +18,7 @@ qu="False"
 
 # Function to perform analysis and check status
 perform_analysis() {
-    analysis_result=$(vt an "$hash")
+    analysis_result=$(vtcli an "$hash")
     # Extract status using grep
     status=$(echo "$analysis_result" | grep -oP 'status: "\K[^"]+')
 }
@@ -39,13 +39,13 @@ done
 
 
 echo "analysis result:"
-vt an "$hash" 
+vtcli an "$hash" 
 
 
 echo ""
 echo "Deep analysis:"
 hash2=$(md5sum "$1" | awk '{print $1}')
-vt file "$hash2" -s
+vtcli file "$hash2" -s
 
 
 
@@ -66,12 +66,12 @@ check_info() {
 }
  
 # Behavior analysis
-check_info "Behavior analysis:" "vt file behaviours \"$hash2\" -s"
+check_info "Behavior analysis:" "vtcli file behaviours \"$hash2\" -s"
 
 # Relationship analysis
-check_info "Relationship analysis:" "vt file relationships \"$hash2\" -s"
+check_info "Relationship analysis:" "vtcli file relationships \"$hash2\" -s"
 
 # Bundled files analysis
-check_info "Bundled files analysis:" "vt file bundled_files \"$hash2\" -s"
+check_info "Bundled files analysis:" "vtcli file bundled_files \"$hash2\" -s"
 
 echo "Script completed."

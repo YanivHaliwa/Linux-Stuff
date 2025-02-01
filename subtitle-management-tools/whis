@@ -13,8 +13,10 @@ import colorama
 from colorama import Fore, Style as ColoramaStyle
 from pydub import AudioSegment
 import numpy as np
+import warnings
 
-
+global alertOnce
+alertOnce = False
 colorama.init(autoreset=True)
 
 client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
@@ -106,22 +108,29 @@ def get_model_path(model_name):
         "medium": "medium",
         "large": "large-v3",
     }
-    
-    model_path = os.path.expanduser(f"~/.cache/whisper/{model_mapping.get(model_name, model_name)}.pt")
-    return model_path
+    name=model_mapping.get(model_name, model_name)
+    return name
 
 
 def load_whisper_model(model_name, device="cuda"):
+    global alertOnce
     """Safely load whisper model with weights_only=True"""
-    model_path = get_model_path(model_name)
-    
+    model_correct = get_model_path(model_name)
+    user_model=model_name
+    model_path = os.path.expanduser(f"~/.cache/whisper/{model_correct}") 
+    fullpath_modelfile=os.path.join(model_path, model_correct) + ".pt"
+    if alertOnce==False:
+        print(f"User chose {ColoramaStyle.BRIGHT}{user_model}{ColoramaStyle.RESET_ALL} model which maps to {ColoramaStyle.BRIGHT}{model_correct}{ColoramaStyle.RESET_ALL} model file.")
+        alertOnce=True
+
     # First check if model exists, download if needed
     if not os.path.exists(model_path):
-        download_name = "large-v3" if model_name == "turbo" else model_name
+        # download_name = "large-v3" if model_name == "turbo" else model_name
+        download_name = model_correct
         whisper._download(whisper._MODELS[download_name], model_path, False)
     
     # Load the model weights safely with weights_only=True
-    checkpoint = torch.load(model_path, map_location=device, weights_only=True)
+    checkpoint = torch.load(fullpath_modelfile, map_location=device, weights_only=True)
     
     # Initialize model architecture
     dims = whisper.ModelDimensions(**checkpoint["dims"])
@@ -187,7 +196,8 @@ def transcribe_audio(audio_path, model_name="large-v3", language=None):
             print("GPU out of memory. Falling back to CPU...")
             torch.cuda.empty_cache()
             gc.collect()
-            
+
+            warnings.filterwarnings("ignore", category=UserWarning, module="whisper.transcribe")
             device = "cpu"
             model = load_whisper_model(model_name, device)
             model = enable_checkpointing(model)

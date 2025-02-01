@@ -185,37 +185,44 @@ def htj(hashcat_mode):
  
 
 def main():
-    parser = argparse.ArgumentParser(description="This is a script for hashcat operations.")
-    parser.add_argument("-f", "--hashfile", help="Path to the hash file", required=True)
+    # parser = argparse.ArgumentParser(description="This is a script for hashcat operations.\n\nChoose one of the following options:")
+    parser = argparse.ArgumentParser(description="This is a script for hashcat operations.\nChoose one of the following", formatter_class=argparse.RawTextHelpFormatter)
+    parser.add_argument("-f", "--hashfile", help="Path to the hash file", required=False)
     parser.add_argument("-t", "--hashtype", help="Optional hash type or part of it for searching", required=False)
     args = parser.parse_args()
+
+    if not args.hashfile and not args.hashtype:
+        print("Please provide a hash file or hash type.\n")
+        parser.print_help()
+        sys.exit(1)
     try:
+        hash_type_code = hash_type = None
         if args.hashtype:
-            hash_type = choose_hash_type(type_file, args.hashtype)
-            if not hash_type:
-                return  # Exit if no hash type is found
-        else:
+            result = choose_hash_type(type_file, args.hashtype)
+            if not result:
+                sys.exit(1)
+            hash_type_code, hash_type = result
+        elif args.hashfile:
             analyze_hash(args.hashfile)
-            print("")
-            user_hash_type = input(f"{Fore.CYAN}Enter the hash type name or part of it /  or HC code: {Style.RESET_ALL}")
-            result = choose_hash_type(type_file, user_hash_type)
-            if result is None:
-                print(f"{Fore.RED}No matching hash types found. Exiting.'{Style.RESET_ALL}")
-                sys.exit(1)   
-            else:
-                hash_type_code, hash_type = result
+            user_input = input(f"{Fore.CYAN}Enter the hash type name or part of it / or HC code: {Style.RESET_ALL}")
+            result = choose_hash_type(type_file, user_input)
+            if not result:
+                sys.exit(1)
+            hash_type_code, hash_type = result
 
-        hash_value = get_hash(args.hashfile)
-        if hash_value:
-            print(f"{Fore.MAGENTA}\nHash Value: {hash_value}{Style.RESET_ALL}")
-            print(f"{Fore.MAGENTA}Hash Mode: {hash_type}{Style.RESET_ALL}")
-            print(f"{Fore.MAGENTA}Hashcat Code for this type: {hash_type_code}{Style.RESET_ALL}")
-            john_format = htj(hash_type_code)
-            print(f"{Fore.MAGENTA}John the Ripper format this type: {john_format}{Style.RESET_ALL}")
+        if args.hashfile:
+            hash_value = get_hash(args.hashfile)
+            if hash_value:
+                print(f"{Fore.MAGENTA}\nHash Value: {hash_value}{Style.RESET_ALL}")
         else:
-            print("Could not read hash value from file.")
+            print(f"{Fore.MAGENTA}\nNo hash file provided. Displaying hash type information:{Style.RESET_ALL}")
 
-        
+        if hash_type_code and hash_type:
+            print(f"{Fore.MAGENTA}Hash Mode: {hash_type}{Style.RESET_ALL}")
+            print(f"{Fore.MAGENTA}Hashcat Code: {hash_type_code}{Style.RESET_ALL}")
+            john_format = htj(hash_type_code)
+            print(f"{Fore.MAGENTA}John the Ripper Format: {john_format}{Style.RESET_ALL}")
+
     except KeyboardInterrupt:
         print("\nbye..")
         sys.exit(1)
