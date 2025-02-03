@@ -117,18 +117,17 @@ def load_whisper_model(model_name, device="cuda"):
     """Safely load whisper model with weights_only=True"""
     model_correct = get_model_path(model_name)
     user_model=model_name
-    model_path = os.path.expanduser(f"~/.cache/whisper/{model_correct}") 
+    model_path = os.path.expanduser(f"~/.cache/whisper/") 
     fullpath_modelfile=os.path.join(model_path, model_correct) + ".pt"
     if alertOnce==False:
         print(f"User chose {ColoramaStyle.BRIGHT}{user_model}{ColoramaStyle.RESET_ALL} model which maps to {ColoramaStyle.BRIGHT}{model_correct}{ColoramaStyle.RESET_ALL} model file.")
         alertOnce=True
 
     # First check if model exists, download if needed
-    if not os.path.exists(model_path):
-        # download_name = "large-v3" if model_name == "turbo" else model_name
+    if not os.path.exists(fullpath_modelfile):
         download_name = model_correct
         whisper._download(whisper._MODELS[download_name], model_path, False)
-    
+
     # Load the model weights safely with weights_only=True
     checkpoint = torch.load(fullpath_modelfile, map_location=device, weights_only=True)
     
