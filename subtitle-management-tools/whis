@@ -237,21 +237,26 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     audio_path = args.audio_file
-    SAMPLING_RATE = 16000
-    print(f"Loading and resampling audio...")
-    audio = AudioSegment.from_file(audio_path)
-    audio = audio.set_channels(1)  # Convert to mono
-    audio = audio.set_frame_rate(SAMPLING_RATE)  # Resample to 16000 Hz
+    # SAMPLING_RATE = 16000
+    # print(f"Loading and resampling audio...")
+    # audio = AudioSegment.from_file(audio_path)
+    # audio = audio.set_channels(1)  # Convert to mono
+    # audio = audio.set_frame_rate(SAMPLING_RATE)  # Resample to 16000 Hz
 
-    # Convert to numpy array and normalize
-    samples = np.array(audio.get_array_of_samples()).astype(np.float32)
-    if audio.sample_width == 2:  # Assuming 16-bit PCM
-        samples /= 32768.0  # Normalize to [-1.0, 1.0]
+    # # Convert to numpy array and normalize
+    # samples = np.array(audio.get_array_of_samples()).astype(np.float32)
+    # if audio.sample_width == 2:  # Assuming 16-bit PCM
+    #     samples /= 32768.0  # Normalize to [-1.0, 1.0]
 
-    # Make sure it's a 1D array and reshape if needed
-    audio_np = np.array(samples, dtype=np.float32)
+    # # Make sure it's a 1D array and reshape if needed
+    # audio_np = np.array(samples, dtype=np.float32)
 
     try:
+        # Load and resample audio
+        audio_path = args.audio_file
+        print("Loading and resampling audio with Whisper defaults...")
+        audio_np = whisper.load_audio(audio_path)  # Loads, resamples to 16kHz, converts to mono, and normalizes
+
         result = transcribe_audio(audio_np, model_name=args.model, language=args.lang)
 
         # Determine output file name
