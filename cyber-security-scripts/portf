@@ -124,8 +124,11 @@ except KeyboardInterrupt:
 if open_ports: 
   print("\033[1;35m\n\nFinal list of open ports:\033[0m")
   op = sorted(set(open_ports))
+  po=""
   for p in op:
      find_service(str(p))
+     po=po+str(p)+","
+  print("\n\n\033[1;35mPorts: \033[0m"+po)
      
 
 else: 

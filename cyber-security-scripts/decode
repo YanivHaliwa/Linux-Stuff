@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import base64
-import urllib.parse
 import sys
 from termcolor import colored
 import nltk 
@@ -15,12 +14,9 @@ import zlib
 import ast
 import os
 import argparse
-import re
-import traceback
 import magic
 import string
- 
- 
+import wordninja
 import nltk
 import warnings
 from functools import lru_cache
@@ -61,10 +57,21 @@ def en(text):
     # If it's multiple words
     intersection = text_words.intersection(all_words)
  
-    return len(intersection) >=1   
-
-
-
+    return len(intersection) >=1  
+ 
+def wordn(text):
+        splitted = wordninja.split(text)
+        english_words = []
+        
+        for word in splitted:
+            # Adjust the length check if needed; here it skips words <= 3 characters.
+            if len(word) > 3 and en(word):
+                english_words.append(word)
+        if english_words:
+            return True
+        else:
+            return False
+        
 
 global result
 result=None
@@ -275,19 +282,18 @@ def decode_caesar(input_string,shift):
     return decoded
    
 
-def read_input(file_path=None):
-    print("im inside the function file is:",file_path)
-    if file_path:
+def read_input(uinput=None):
+    if uinput:
         try:
-            with open(file_path, 'r') as f:
+            with open(uinput, 'r') as f:
                 return f.read().strip()
         except FileNotFoundError:
-            print(colored("File not found", "red"))
-            sys.exit(1)
+           string=sys.argv[1]
+           if string.strip():
+               return string   
         except Exception as e:
             pass
-    else:
-        return input("Please enter a string: ")
+    
 
 def binary_to_text(binary_sequence):
     # Identify the delimiter used in the sequence
@@ -659,29 +665,28 @@ if __name__ == "__main__":
     parser.add_argument("-p", "--spec", help="Activate Specialized Decoders: Morse Code, Zlib Compression, Brainfuck", action="store_true")
     parser.add_argument("-e", "--english", help="Activate all methods but limit results to English strings", action="store_true")
     parser.add_argument("-x", "--xor", help="Activate decoder: XOR chiper", action="store_true")
-
- 
-
     
     args = parser.parse_args()
    
-    print (sys.argv)
+    # print (sys.argv)
+    input_string=""
     if len(sys.argv) > 1 and not '-h' in sys.argv or '--help' in sys.argv:
         file_path = args.file_path
     try:   
         input_string = read_input(file_path)
-        print("string ",input_string)
     except KeyboardInterrupt:
         print("\rexiting..\033[K\n", end='', flush=True)
         sys.exit(0)
     except Exception as i:
-        print (i)
+        pass # print (i)
 
     # sys.exit(0)
 
     if not input_string:
-        print(colored("Usage: {} <string> or {} <path/to/file>".format(sys.argv[0], sys.argv[0]), "red"))
+        parser.print_help()
         sys.exit(1)
+        # print(colored("Usage:\n decode <string> \n decode <path/to/file>".format(sys.argv[0], sys.argv[0]), "yellow"))
+        # sys.exit(1)
 
     os.system('clear')
     
@@ -711,31 +716,31 @@ if __name__ == "__main__":
     if args.system or args.all or args.english:
         unicode=decode_unicode_escape(input_string)
         if unicode:
-            is_english=en(unicode)
+            is_english=en(unicode) or wordn(unicode)
             print_decoded_output(unicode, "Unicode", is_english)
         
     if args.system or args.all or args.english:
         ascii_value = ascii_to_text(input_string)
         if ascii_value:
-            is_english = en(ascii_value)
+            is_english = en(ascii_value) or wordn(ascii_value)
             print_decoded_output(ascii_value, "Ascii", is_english)
 
     if args.system or args.all or args.english:
         octal_d = octal_to_text(input_string)
         if octal_d:
-            is_english = en(octal_d)
+            is_english = en(octal_d) or wordn(octal_d)
             print_decoded_output(octal_d, "Octal", is_english)
  
     if args.system or args.all or args.english:
         binary=binary_to_text(input_string)
         if  binary:
-                is_english=en(binary)
+                is_english=en(binary) or wordn(binary)
                 print_decoded_output(binary, "Binary", is_english) 
 
     if args.system or args.all or args.english:
         hexi=decode_hex(input_string)
         if hexi:
-                is_english=en(hexi)
+                is_english=en(hexi) or wordn(hexi)
                 print_decoded_output(hexi, "Hex", is_english) 
     
 
@@ -743,25 +748,25 @@ if __name__ == "__main__":
     if args.base or args.all or args.english:
         base16_value=decode_base16(input_string)
         if base16_value:
-            is_english=en(base16_value)
+            is_english=en(base16_value)  or wordn(base16_value)
             print_decoded_output(base16_value, "Base16", is_english)
 
     if args.base or args.all or args.english:
         base32 = decode_base32(input_string)   
         if base32:
-            is_english = en(base32)
+            is_english = en(base32) or wordn(base32)
             print_decoded_output(base32, "Base32", is_english)
 
     if args.base or args.all or args.english:
         base58_value = base58_decode(input_string)
         if base58_value:
-            is_english = en(base58_value)
+            is_english = en(base58_value) or wordn(base58_value)
             print_decoded_output(base58_value, "Base58", is_english)
  
     if args.base or args.all or args.english: 
         base85=decode_base85(input_string)  # This will update fbase64
         if fbase85[0]:
-               is_english = en(fbase85[0])
+               is_english = en(fbase85[0]) or wordn(fbase85[0])
                print_decoded_output(fbase85[0], "Base85", is_english)
         else:
             if fbase85[1] and fbase85[1] != "data" and all(x not in fbase85[1] for x in ["EBCDIC", "text","very short","no magic","empty"]):
@@ -775,7 +780,7 @@ if __name__ == "__main__":
         # print (b64)
         # print("\n",fbase64)
         if fbase64[0]:        
-               is_english = en(fbase64[0])
+               is_english = en(fbase64[0]) or wordn(fbase64[0])
                print_decoded_output(fbase64[0], "Base64", is_english)
         else:
             if fbase64[1] and fbase64[1] != "data" and all(x not in fbase64[1] for x in ["EBCDIC", "text","very short","no magic","empty"]):
@@ -787,19 +792,19 @@ if __name__ == "__main__":
     if args.internet or args.all or args.english:
         urli = advanced_url_decode(input_string)
         if urli and urli != input_string:
-            is_english = en(urli)
+            is_english = en(urli) or wordn(urli)
             print_decoded_output(urli, "URL", is_english)
     
     if args.internet or args.all or args.english:    
         punycode=decode_punycode(input_string)
         if punycode and punycode != input_string:
-            is_english=en(punycode)
+            is_english=en(punycode) or wordn(punycode)
             print_decoded_output(punycode,"punycode", is_english)
 
     if args.internet or args.all or args.english:
         jwt=decode_jwt(input_string)  
         if jwt:
-            is_english=en(jwt)
+            is_english=en(jwt) or wordn(jwt)
             print_decoded_output(jwt,"JWT Tokens", is_english)
 
 
@@ -809,22 +814,25 @@ if __name__ == "__main__":
     if args.chiper or args.all or args.english:
         atbash=decode_atbash(input_string)
         if atbash and atbash != input_string:
-            is_english=en(atbash)
+            is_english=en(atbash) or wordn(atbash)
             print_decoded_output(atbash,"Atbash cipher", is_english)
 
     if args.chiper or args.all or args.english:
         rot47=decode_rot47(input_string)
         if rot47:
-            is_english=en(rot47)
+            is_english=en(rot47) or wordn(rot47)
             print_decoded_output(rot47, "ROT47", is_english)
 
+    
     if args.chiper or args.all or args.english:
         final_cae=[]
         cae2=[]
         found=False
         for s in range(26):
             cae = decode_caesar(input_string, s)
-            is_english = en(cae)
+            # is_english = en(cae)
+            # english2=wordn(cae)
+            is_english = en(cae) or wordn(cae)
             if input_string not in cae:
                 if is_english:
                     found = True
@@ -834,13 +842,13 @@ if __name__ == "__main__":
         if args.english or found:
             if found:
                 final_cae_str = ', '.join([f"{colored(cae, 'yellow')} (shift {s})" for cae, s in final_cae])
-                print("\n" + colored("Caesar Cipher Decode [ROT13]:", "green"), colored("--probable--", "red"), flush=True)
+                print("\n" + colored("Caesar Cipher Decode:", "green"), colored("--probable--", "red"), flush=True)
                 print(final_cae_str)
         elif not args.english:
             if not found:
                 try:
                     if cae2:
-                        print("\n" + colored("Caesar Cipher Decode [ROT13]:", "blue"), "\nno match in English so showing all probability", flush=True)
+                        print("\n" + colored("Caesar Cipher Decode:", "blue"), "\nno match in English so showing all probability", flush=True)
                         cae2_str = ', '.join([f"{colored(cae, 'yellow')} (shift {s})" for cae, s in cae2])
                         print(cae2_str)
                 except:
@@ -850,38 +858,38 @@ if __name__ == "__main__":
         morse = decode_morse(input_string)
         if morse:
             if morse.strip():
-                is_english = en(morse) 
+                is_english = en(morse) or wordn(morse) 
                 print_decoded_output(morse, "Morse", is_english)
 
     if args.spec or args.all or args.english:  
         zlib=decode_zlib(input_string) ##faild
         if zlib:
-            is_english=en(zlib)
+            is_english=en(zlib) or wordn(zlib)
             print_decoded_output(zlib,"Zlib", is_english)
 
     if args.spec or args.all or args.english:  
         brainfuck = decode_brainfuck(input_string)
         if brainfuck:
-            is_english = en(brainfuck)
+            is_english = en(brainfuck) or wordn(brainfuck)
             print_decoded_output(brainfuck, "Brainfuck", is_english)
 
     if args.data or args.all or args.english:
         hdump=clean_hex_dump(input_string)
         if hdump:
-            is_english=en(hdump)
+            is_english=en(hdump) or wordn(hdump)
             print_decoded_output(hdump,"Hex dump",is_english)
 
     if args.data or args.all or args.english:    
         uue=decode_uu(input_string)
         if uue:
             uue = uue.decode('utf-8')
-            is_english=en(uue)
+            is_english=en(uue) or wordn(uue)
             print_decoded_output(uue,"UUencoding", is_english)
 
     if args.data or args.all or args.english:
         quoted=decode_quoted_printable(input_string)
         if quoted and quoted != input_string:
-            is_english=en(quoted)
+            is_english=en(quoted) or wordn(quoted)
             print_decoded_output(quoted,"quoted_printable", is_english)
     
 print("")
