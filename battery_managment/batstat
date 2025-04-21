@@ -3,6 +3,11 @@
 # Log file path
 LOG_FILE="$HOME/.cache/battery_state_log.txt"
 
+# Create log file if it doesn't exist
+if [ ! -f "$LOG_FILE" ]; then
+    touch "$LOG_FILE"
+fi
+
 # Check current battery state
 CURRENT_STATE=$(upower -i $(upower -e | grep battery) | grep state | awk '{print $2}')
 
