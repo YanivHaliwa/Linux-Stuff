@@ -68,3 +68,7 @@ The files linux_packs_needed.txt and pip_needed.txt contain lists of pip or apt 
 - **resetnet**: Resets network settings and services.
 - **sysa**: Manages system services by enabling or disabling them.
 - **update**: Updates and upgrades system packages, including fixing broken dependencies.
+
+## Author
+
+Created by [Yaniv Haliwa](https://github.com/YanivHaliwa) for security testing and educational purposes.
