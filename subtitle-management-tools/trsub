@@ -86,7 +86,14 @@ elif [ -d "$1" ]; then
     # vidsubs "$1"
     echo ""
     echo -e "\033[1;32mTranslate subtitles for directory\033[0m"
-    trf -d "$1"
+    # Try using different translators if one fails
+    if ! trf -d "$1"; then
+        if ! trf -d "$1" -cl; then
+            if ! trf -d "$1" -gp; then
+                trf -d "$1" -co
+            fi
+        fi
+    fi
     # vidsubs "$1"
 else
     echo "Error: '$1' is neither a file nor a directory."

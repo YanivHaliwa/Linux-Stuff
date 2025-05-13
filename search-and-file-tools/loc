@@ -5,6 +5,7 @@ if [ "$#" -ne 2 ]; then
     echo "Usage: $0 <directory> <search_term>"
     exit 1
 fi
+echo '314674' | sudo -S updatedb  && sudo updatedb -o /var/lib/plocate/plocate.db
 
 # Extract arguments
 directory=$1

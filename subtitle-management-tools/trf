@@ -26,8 +26,17 @@ client_oi = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 modelgp = "gpt-4o"
 
 
-client_cl = anthropic.Anthropic()
-model_cl = "claude-3-opus-20240229"
+try:
+    client_cl = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
+    model_cl = "claude-3-opus-20240229"
+except TypeError:
+    # For newer versions of the Anthropic SDK that don't accept 'proxies'
+    import httpx
+    client_cl = anthropic.Anthropic(
+        api_key=os.environ.get("ANTHROPIC_API_KEY"),
+        http_client=httpx.Client(follow_redirects=True)
+    )
+    model_cl = "claude-3-opus-20240229"
 
 # Initialize colorama
 init()

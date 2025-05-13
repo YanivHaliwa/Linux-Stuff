@@ -42,7 +42,7 @@ for dirpath, dirnames, filenames in os.walk(loc):
                         print(colored_title + " " + colored_filepath + "\n")
                         x+=1
                     # Otherwise, check for an exact word match
-                    elif not args.pattern and search in line.split():
+                    elif not args.pattern and search in line:
                         print(colored_title + " " + colored_filepath + "\n")
                         x+=1
         except KeyboardInterrupt:
